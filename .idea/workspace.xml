@@ -12,7 +12,6 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="6b9230ef-5e82-4d51-a5f7-0f0b3d2a3b3e" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -70,7 +69,7 @@
       <option name="presentableId" value="Default" />
       <updated>1569304337786</updated>
       <workItem from="1569304342091" duration="343000" />
-      <workItem from="1569305298045" duration="22280000" />
+      <workItem from="1569305298045" duration="22472000" />
     </task>
     <task id="LOCAL-00001" summary="first commit">
       <created>1569337141862</created>
@@ -86,7 +85,21 @@
       <option name="project" value="LOCAL" />
       <updated>1569337341198</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="update">
+      <created>1569338187159</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1569338187159</updated>
+    </task>
+    <task id="LOCAL-00004" summary="update">
+      <created>1569338286152</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1569338286152</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -107,6 +120,7 @@
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <MESSAGE value="first commit" />
     <MESSAGE value="add datum" />
-    <option name="LAST_COMMIT_MESSAGE" value="add datum" />
+    <MESSAGE value="update" />
+    <option name="LAST_COMMIT_MESSAGE" value="update" />
   </component>
 </project>

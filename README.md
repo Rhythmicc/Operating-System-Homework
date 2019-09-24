@@ -5,7 +5,7 @@
 ## Usage:
 
 - compile and run: `./run.py -br`
-  - About `run.py`：you can get it from Pypi Library [Qpro](https://pypi.org/project/Qpro/) and search usage at [here](https://github.com/Rhythmicc/ACM-Template).
+  - About `run.py`：you can get it from Pypi Library [Qpro](https://pypi.org/project/Qpro/) and search usage at [here](https://github.com/Rhythmicc/ACM-Template#运行脚本).
 
 - Not recommended usage:
 
