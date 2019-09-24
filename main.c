@@ -1,0 +1,164 @@
+/**
+ * Simple shell interface program.
+ *
+ * Operating System Concepts - Ninth Edition
+ * Copyright John Wiley & Sons - 2013
+ */
+
+#include <string.h>
+#include <ctype.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include<sys/types.h>
+#include <sys/wait.h>
+
+#define MAX_LINE		80 /* 80 chars per line, per command */
+
+typedef struct stringbuffer {
+    char *line;
+    char *start;
+    unsigned max_len, len;
+}sstream;
+
+int blank(char x) {
+    return isblank(x) || x == '\n' ? 1 : 0;
+}
+
+int seof(sstream*stream) {
+    return stream->start - stream->line == stream->len ? 1 : 0;
+}
+
+void stream_getline(sstream*stream) {
+    fgets(stream->line, (int) stream->max_len, stdin);
+    stream->start = stream->line;
+    stream->len = strlen(stream->line);
+}
+
+sstream*newSstream(unsigned len) {
+    sstream *ret = (sstream *) malloc(sizeof(sstream));
+    ret->line = (char *) malloc(sizeof(char) * len);
+    ret->start = ret->line;
+    ret->max_len = len;
+    ret->len = 0;
+    return ret;
+}
+
+void chrcpy(char*dest,char*start,const char*end) {
+    for (char *i = start; i != end; ++i) {
+        *dest = *i;
+        ++dest;
+    }
+    *dest = '\0';
+}
+
+int nextString(sstream*stream, char*dist) {
+    while (*(stream->start) && blank(*(stream->start)))++(stream->start);
+    if (seof(stream))return 0;
+    char *pre_start = stream->start;
+    while (*(stream->start) && !blank(*(stream->start)))++(stream->start);
+    chrcpy(dist, pre_start, stream->start);
+    return 1;
+}
+
+typedef struct {
+    char **v;
+    int tail, max_tail;
+}vector;
+
+vector ls;
+
+char*get_element(unsigned n) {
+    if (n < ls.tail)return ls.v[n];
+    return NULL;
+}
+
+void push_back(char*cmd) {
+    if (ls.tail == ls.max_tail) {
+        ls.max_tail += 10;
+        ls.v = realloc(ls.v, sizeof(char *) * ls.max_tail);
+    }
+    ls.v[ls.tail] = (char *) malloc(sizeof(char) * (strlen(cmd) + 1));
+    strcpy(ls.v[ls.tail], cmd);
+    ++ls.tail;
+}
+
+int execute(char*args[], int background) {
+    pid_t pid = fork();
+    if (pid == -1) {
+        puts("Can't fork!");
+        return -1;
+    } else if (!pid) {
+        int res = execvp(args[0], args);
+        if (res)puts("Execute failed");
+        exit(res);
+    } else if (!background) {
+        int status;
+        wait(&status);
+        return status;
+    }
+    return 1;
+}
+
+int main(void) {
+    char *args[MAX_LINE / 2 + 1];    /* command line (of 80) has max of 40 arguments */
+    int has_alloc[MAX_LINE / 2 + 1];
+    memset(has_alloc, 0, sizeof(has_alloc));
+    sstream *stream = newSstream(1005);
+    char argv[105];
+    int should_run = 1;
+    int i, upper;
+    ls.max_tail = 10;
+    ls.tail = 0;
+    ls.v = (char **) malloc(sizeof(char *) * ls.max_tail);
+    while (should_run) {
+        printf("osh>");
+        stream_getline(stream);
+        int empty = 1;
+        for (size_t k = 0; k < stream->len; ++k)
+            if (!blank(stream->line[k])) {
+                empty = 0;
+                break;
+            }
+        if (empty)continue;
+        int tail = 0;
+        while (nextString(stream, argv)) {
+            if (has_alloc[tail])args[tail] = (char *) realloc(args[tail], sizeof(char) * strlen(argv));
+            else {
+                args[tail] = (char *) malloc(sizeof(char) * strlen(argv));
+                has_alloc[tail] = 1;
+            }
+            strcpy(args[tail], argv);
+            ++tail;
+        }
+        if (!strcmp(args[0], "exit"))should_run = 0;
+        else if (!strcmp(argv, "!!")) {
+            if (ls.tail)for (i = 0; i < ls.tail; ++i)printf("%d %s", i + 1, ls.v[i]);
+            else puts("No commands in history!");
+        } else if (args[0][0] == '!') {
+            if (tail == 2) {
+                unsigned indx = 0;
+                size_t p, len = strlen(args[1]);
+                for (p = 0; p < len; ++p)indx = indx * 10 + (args[1][p] - '0');
+                if (indx) {
+                    char *res = get_element(indx - 1);
+                    if (res)printf("%d %s", indx, res);
+                    else puts("No enough commands!");
+                } else puts("Search index based 1!");
+            } else puts("Error: No number after \"!\"");
+        } else {
+            int back = args[tail - 1][0] == '&' ? 1 : 0;
+            if (back) {
+                free(args[tail - 1]);
+                args[tail - 1] = NULL;
+                has_alloc[tail - 1] = 0;
+            }
+            if (!execute(args, back))push_back(stream->line);
+        }
+    }
+    for (i = 0; i < MAX_LINE / 2 + 1; ++i)if (has_alloc[i])free(args[i]);
+    for (i = 0; i < ls.tail; ++i)free(ls.v[i]);
+    free(ls.v);
+    free(stream);
+    return 0;
+}
