@@ -7,16 +7,16 @@
 - compile and run: `./run.py -br`
   - About `run.py`：you can get it from Pypi Library [Qpro](https://pypi.org/project/Qpro/) and search usage at [here](https://github.com/Rhythmicc/ACM-Template).
 
+- Not recommended usage:
+
+  - `osh>command &`: this command will make command not be added into history list and break prompt displaying.
+   
 | command | means |
 |:---|:---|
 |`osh>exit`| exit |
 | `osh>!!` | view all command history |
 |`osh>! <indx>`| view the \<indx\>th command in history|
 
-- Not recommended usage:
-
-  - `osh>command &`: this command will make command not be added into history list and break prompt displaying.
-   
 
 ## Outstanding problems:
 
