@@ -9,7 +9,7 @@
 
 - Not recommended usage:
 
-  - `osh>command &`: this command will make command not be added into history list and break prompt displaying.
+  - `osh>command &`: this operation may make `osh` no response.
    
 | command | means |
 |:---|:---|

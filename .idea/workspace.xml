@@ -11,7 +11,7 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6b9230ef-5e82-4d51-a5f7-0f0b3d2a3b3e" name="Default Changelist" comment="">
+    <list default="true" id="6b9230ef-5e82-4d51-a5f7-0f0b3d2a3b3e" name="Default Changelist" comment="update">
       <change afterPath="$PROJECT_DIR$/osc9e-src/ch11/LockingExample.java" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/osc9e-src/ch11/README" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/osc9e-src/ch11/lockfile.txt" afterDir="false" />
@@ -56,10 +56,6 @@
       <change afterPath="$PROJECT_DIR$/osc9e-src/ch9/windows-programs/consumer.c" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/osc9e-src/ch9/windows-programs/producer.c" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/osc9e-src/ch9/windows-programs/temp.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmake-build-debug/OS" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/OS" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.c" beforeDir="false" afterPath="$PROJECT_DIR$/main.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/run.py" beforeDir="false" afterPath="$PROJECT_DIR$/run.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -117,7 +113,7 @@
       <updated>1569304337786</updated>
       <workItem from="1569304342091" duration="343000" />
       <workItem from="1569305298045" duration="22761000" />
-      <workItem from="1569374192325" duration="5029000" />
+      <workItem from="1569374192325" duration="5274000" />
     </task>
     <task id="LOCAL-00001" summary="first commit">
       <created>1569337141862</created>
@@ -154,7 +150,14 @@
       <option name="project" value="LOCAL" />
       <updated>1569338432158</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="update">
+      <created>1569380897540</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1569380897540</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
