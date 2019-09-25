@@ -95,10 +95,10 @@ int pid_pipe[2],not_have_listener[2];
 
 void listener(void*pro) {
     pid_t *p = (pid_t *)pro;
-    ULL pid;
+    pid_t pid;
     while(1){
-        close(pid_pipe[1]);
         if(read(pid_pipe[0], &pid, sizeof(pid_t)) != -1)*p+=pid;
+        printf("listener pid: %d, *p: %d\n",pid,*p);
         if(!*p)return;
     }
 }
@@ -110,6 +110,7 @@ void manage_process() {
         pthread_t tid;
         pthread_create(&tid, NULL, (void *) listener, (void *) &process);
         pthread_join(tid, NULL); /// create thread to listen pid
+        printf("compress pid: %d\n",process);
         while (process) {
             pid_t pid = waitpid(-group,&status,WNOHANG);
             printf("get pid: %d\n",pid);
@@ -117,7 +118,6 @@ void manage_process() {
         }
         /// all son process is done
         status = 1;
-        close(not_have_listener[0]);
         write(not_have_listener[1], &status, sizeof(int));
         exit(0);
     }
@@ -138,14 +138,12 @@ int execute(char*args[], int background) {
             return 0;
         } else {
             int status;
-            close(pid_pipe[0]);
             write(pid_pipe[1], &pid, sizeof(pid_t)); /// add pid to manager
-            close(not_have_listener[1]);
             if (read(not_have_listener[0], &status, sizeof(int)) != -1)
                 manage_process(); /// check whether exist listener and create listener.
         }
     }
-    return 1;
+    return 0;
 }
 
 int main(void) {

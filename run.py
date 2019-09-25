@@ -13,7 +13,7 @@ else:
 base_dir += dir_char
 
 config = {
-    'compile_tool': ('gcc -std=c11', ''),
+    'compile_tool': ('gcc -std=c11', '-lpthread'),
     'compile_filename': base_dir + 'main.c',
     'executable_filename': base_dir + 'cmake-build-debug' + dir_char + 'OS',
     'input_file': base_dir + 'cmake-build-debug' + dir_char + 'input.txt'
