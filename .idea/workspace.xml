@@ -12,7 +12,54 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="6b9230ef-5e82-4d51-a5f7-0f0b3d2a3b3e" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/osc9e-src/ch11/LockingExample.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/osc9e-src/ch11/README" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/osc9e-src/ch11/lockfile.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/osc9e-src/ch12/file1.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/osc9e-src/ch12/file3.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/osc9e-src/ch17/DNSLookUp.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/osc9e-src/ch2/.simple.ko.cmd" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/osc9e-src/ch2/.simple.mod.o.cmd" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/osc9e-src/ch2/.simple.o.cmd" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/osc9e-src/ch2/.tmp_versions/simple.mod" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/osc9e-src/ch2/Makefile" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/osc9e-src/ch2/Module.symvers" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/osc9e-src/ch2/modules.order" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/osc9e-src/ch2/simple.c" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/osc9e-src/ch2/simple.ko" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/osc9e-src/ch2/simple.mod.c" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/osc9e-src/ch2/simple.mod.o" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/osc9e-src/ch2/simple.o" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/osc9e-src/ch3/DateClient.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/osc9e-src/ch3/DateServer.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/osc9e-src/ch3/fork-question-1.c" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/osc9e-src/ch3/fork-question-2.c" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/osc9e-src/ch3/newproc-posix.c" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/osc9e-src/ch3/newproc-win32.c" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/osc9e-src/ch3/shm-posix-consumer.c" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/osc9e-src/ch3/shm-posix-producer.c" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/osc9e-src/ch3/simple-shell.c" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/osc9e-src/ch3/unix_pipe.c" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/osc9e-src/ch3/win32-pipe-child.c" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/osc9e-src/ch3/win32-pipe-parent.c" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/osc9e-src/ch4/Driver.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/osc9e-src/ch4/openmp.c" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/osc9e-src/ch4/thrd-posix.c" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/osc9e-src/ch4/thrd-win32.c" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/osc9e-src/ch5/posix-sem.c" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/osc9e-src/ch6/posix-rt.c" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/osc9e-src/ch6/posix-sched.c" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/osc9e-src/ch9/BACKING_STORE.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/osc9e-src/ch9/addresses.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/osc9e-src/ch9/correct.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/osc9e-src/ch9/windows-programs/README" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/osc9e-src/ch9/windows-programs/consumer.c" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/osc9e-src/ch9/windows-programs/producer.c" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/osc9e-src/ch9/windows-programs/temp.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmake-build-debug/OS" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/OS" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.c" beforeDir="false" afterPath="$PROJECT_DIR$/main.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/run.py" beforeDir="false" afterPath="$PROJECT_DIR$/run.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -69,7 +116,8 @@
       <option name="presentableId" value="Default" />
       <updated>1569304337786</updated>
       <workItem from="1569304342091" duration="343000" />
-      <workItem from="1569305298045" duration="22472000" />
+      <workItem from="1569305298045" duration="22761000" />
+      <workItem from="1569374192325" duration="5029000" />
     </task>
     <task id="LOCAL-00001" summary="first commit">
       <created>1569337141862</created>
@@ -99,7 +147,14 @@
       <option name="project" value="LOCAL" />
       <updated>1569338286152</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="update">
+      <created>1569338432158</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1569338432158</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -110,7 +165,9 @@
       <map>
         <entry key="MAIN">
           <value>
-            <State />
+            <State>
+              <option name="COLUMN_ORDER" />
+            </State>
           </value>
         </entry>
       </map>
