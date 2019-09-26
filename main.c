@@ -13,6 +13,7 @@
 #include <pthread.h>
 #include<sys/types.h>
 #include <sys/wait.h>
+#include <fcntl.h>
 
 #define MAX_LINE		80 /* 80 chars per line, per command */
 typedef unsigned long long ULL;
@@ -91,13 +92,13 @@ void push_back(char*cmd) {
     ++ls.tail;
 }
 
-int pid_pipe[2],not_have_listener[2];
+int pid_pipe[2], not_have_listener[2];
 
 void listener(void*pro) {
     pid_t *p = (pid_t *)pro;
     pid_t pid;
     while(1){
-        if(read(pid_pipe[0], &pid, sizeof(pid_t)) != -1)*p+=pid;
+        if(read(pid_pipe[0], &pid, sizeof(pid_t))>0)*p+=pid;
         printf("listener pid: %d, *p: %d\n",pid,*p);
         if(!*p)return;
     }
@@ -112,7 +113,7 @@ void manage_process() {
         pthread_join(tid, NULL); /// create thread to listen pid
         printf("compress pid: %d\n",process);
         while (process) {
-            pid_t pid = waitpid(-group,&status,WNOHANG);
+            pid_t pid = waitpid(-group,&status,WCONTINUED);
             printf("get pid: %d\n",pid);
             if(pid>0)process-=pid; /// catch process done
         }
@@ -154,13 +155,13 @@ int main(void) {
     sstream *stream = newSstream(1005);
     char argv[105];
     int should_run = 1;
-    int i, upper=1;
+    int i, upper = 1;
     ls.max_tail = 10;
     ls.tail = 0;
     ls.v = (char **) malloc(sizeof(char *) * ls.max_tail);
-    pipe(pid_pipe),pipe(not_have_listener);
+    pipe(pid_pipe), pipe(not_have_listener);
     write(not_have_listener[1], &upper, sizeof(int));
-    /// TODO: mainloop
+    /// mainloop
     while (should_run) {
         printf("osh>");
         stream_getline(stream);
