@@ -17,8 +17,12 @@ stdlib.h
 -
 unistd.h
 -
+pthread.h
+-
 sys/types.h
 -
 sys/wait.h
+-
+fcntl.h
 -
 

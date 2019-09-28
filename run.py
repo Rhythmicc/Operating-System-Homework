@@ -13,14 +13,14 @@ else:
 base_dir += dir_char
 
 config = {
-    'compile_tool': ('gcc -std=c11', '-lpthread'),
+    'compile_tool': ['gcc -std=c11', ''],
     'compile_filename': base_dir + 'main.c',
     'executable_filename': base_dir + 'cmake-build-debug' + dir_char + 'OS',
     'input_file': base_dir + 'cmake-build-debug' + dir_char + 'input.txt'
 }
 
 
-def run(use_txt=False, executable_file=config['executable_filename']):
+def run(use_txt=False, executable_file: str = config['executable_filename']):
     cmd = executable_file + ' '
     if argv:
         cmd += ' '.join(argv)
@@ -66,7 +66,6 @@ if __name__ == '__main__':
         index = sys.argv.index('-f')
         if index == len(sys.argv) - 1:
             print(red_col('ERROR: No file with -f'))
-            exit(-1)
         filename = sys.argv[index + 1]
         if not os.path.exists(filename):
             print(red_col('ERROR: No such file:%s' % filename))
@@ -74,6 +73,8 @@ if __name__ == '__main__':
         if not filename.endswith('.cpp') and not filename.endswith('.c'):
             print(red_col("ERROR: %s is not an C/CPP file" % filename))
             exit(-1)
+        if filename.endswith('.c'):
+            config['compile_tool'][0] = 'gcc -std=c11'
         flag = True
     if '-if' in sys.argv:
         index = sys.argv.index('-if')
