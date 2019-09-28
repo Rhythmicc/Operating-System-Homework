@@ -140,6 +140,9 @@ pid_t mainloop() {
                 strcpy(args[tail], argv);
                 ++tail;
             } /// split command
+            free(args[tail]);
+            args[tail] = NULL;
+            has_alloc[tail] = 0;
             if (!strcmp(args[0], "exit"))should_run = 0; /// exit
             else if (!strcmp(argv, "!!")) { /// view all history
                 if (ls.tail)for (i = 0; i < ls.tail; ++i)printf("%d %s", i + 1, ls.v[i]);
@@ -163,7 +166,7 @@ pid_t mainloop() {
                     has_alloc[tail - 1] = 0;
                 }
                 push_back(stream->line);
-                printf("group pid: %d\n", execute(args, back));
+                execute(args, back);
             }
         }
         /// free space
@@ -177,8 +180,7 @@ pid_t mainloop() {
 }
 
 int main(void) {
-    pid_t group = getpgid(mainloop()), pid;
-    printf("group:%d\n", group);
-    while(pid = wait(NULL), pid > 0)printf("get son pid: %d\n", pid);
+    mainloop();
+    while(wait(NULL)>0);
     return 0;
 }
