@@ -4,12 +4,8 @@
 
 ## Usage:
 
-- compile and run: `./run.py -br`
-  - About `run.py`：you can get it from Pypi Library [Qpro](https://pypi.org/project/Qpro/) and search usage at [here](https://github.com/Rhythmicc/ACM-Template#运行脚本).
-
-- Not recommended usage:
-
-  - `osh>command &`: this operation may make `osh` no response.
+- compile and run: `QproRun -br`
+  - About `QproRun`：you can get it from Pypi Library [Qpro](https://pypi.org/project/Qpro/) and search usage.
    
 | command | means |
 |:---|:---|
@@ -17,10 +13,4 @@
 | `osh>!!` | view all command history |
 |`osh>! <indx>`| view the \<indx\>th command in history|
 
-
-## Outstanding problems:
-
-- It's can't run `* &` very well.
-  
-  - I have tried several methods like creating new process to manage background process to solve this problem, but failed.
   

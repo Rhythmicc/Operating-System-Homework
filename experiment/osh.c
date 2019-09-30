@@ -179,13 +179,7 @@ pid_t mainloop() {
     return pid;
 }
 
-void sig_chld(int num){
-    int stat;
-    while(waitpid(-1, &stat, WNOHANG) > 0);
-}
-
 int main(void) {
-    signal(SIGCHLD, sig_chld);
     mainloop();
     while(wait(NULL)>0);
     return 0;
