@@ -1,4 +1,4 @@
-# Operating System Homework and experiment
+# Operating System Homework and Experiment
 
 ## 关于内置CLion(C/CPP Project)扩展工具
 
