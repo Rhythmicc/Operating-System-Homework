@@ -1,8 +1,8 @@
-## Calculate  $\pi$  using Monte-Cario algorithm with multi threads
+## Calculate π using Monte-Cario algorithm with multi threads
 
 - I created ten threads to generate 10000 points( so each thread generated 1000 points).
 
-- Circle function is that: $x^2 + y^2 = 1$
+- Circle function is that: x<sup>2</sup> + y<sup>2</sup> = 1
 
   ```c
   int is_in_circle(double x, double y){
@@ -25,7 +25,7 @@
   }
   ```
 
-- I get $\pi$ value by calculating `in_cir/total*4`.
+- I get π value by calculating `in_cir/total*4`.
 
   Result: `in cricle:7851 total:10000 PI = 3.140400`
 
@@ -35,9 +35,9 @@
 
 ## Some operation to optimize
 
-- Obviously, calculate  $\pi$  is just the process to calculating the area of a circle with radius 1.
+- Obviously, calculate π  is just the process to calculating the area of a circle with radius 1.
 
-- So I can calculate $\pi$ through integrating a circle of radius one. This algorithm can greatly improve accuracy and reduce complexity. (A uniform distribution is a subset of a random distribution)
+- So I can calculate π through integrating a circle of radius one. This algorithm can greatly improve accuracy and reduce complexity. (A uniform distribution is a subset of a random distribution)
 
 - CODE:
 
