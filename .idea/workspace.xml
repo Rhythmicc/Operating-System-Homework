@@ -12,6 +12,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="6b9230ef-5e82-4d51-a5f7-0f0b3d2a3b3e" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cmake-build-debug/OS" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/OS" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.c" beforeDir="false" afterPath="$PROJECT_DIR$/main.c" afterDir="false" />
     </list>
@@ -97,7 +98,9 @@
       <workItem from="1570378434368" duration="40000" />
       <workItem from="1570526355500" duration="155000" />
       <workItem from="1571105107999" duration="2321000" />
-      <workItem from="1571108534097" duration="946000" />
+      <workItem from="1571108534097" duration="1251000" />
+      <workItem from="1571121179744" duration="37000" />
+      <workItem from="1571121331463" duration="328000" />
     </task>
     <task id="LOCAL-00001" summary="first commit">
       <created>1569337141862</created>
@@ -197,7 +200,21 @@
       <option name="project" value="LOCAL" />
       <updated>1571109554595</updated>
     </task>
-    <option name="localTasksCounter" value="15" />
+    <task id="LOCAL-00015" summary="update">
+      <created>1571109908072</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1571109908072</updated>
+    </task>
+    <task id="LOCAL-00016" summary="update">
+      <created>1571110142693</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1571110142693</updated>
+    </task>
+    <option name="localTasksCounter" value="17" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

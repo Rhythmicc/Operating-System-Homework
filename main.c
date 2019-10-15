@@ -8,7 +8,7 @@
 #include <monitor.h>
 #include <pthread.h>
 
-const int MAX_ITER=1000;
+const int MAX_ITER=1e5;
 pthread_mutex_t mutex;
 unsigned in_cir = 0, total = 0;
 
@@ -34,11 +34,10 @@ void *build_montecario(void*args) {
 
 int main(void) {
     srand(time(NULL));
-    for (int i = 0; i < 10; ++i) {
-        pthread_t pthread_id;
-        pthread_create(&pthread_id, NULL, build_montecario, NULL);
-        pthread_join(pthread_id, NULL);
-    }
+    pthread_mutex_init(&mutex,NULL);
+    pthread_t ls[10];
+    for (int i = 0; i < 10; ++i)pthread_create(ls + i, NULL, build_montecario, NULL);
+    for (int i = 0; i < 10; ++i)pthread_join(*(ls + i), NULL);
     sleep(1);
     double PI = 4.0 * in_cir / total;
     printf("in cricle:%u total:%u PI = %lf\n", in_cir, total, PI);
