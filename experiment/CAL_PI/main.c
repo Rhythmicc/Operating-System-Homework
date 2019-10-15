@@ -44,6 +44,5 @@ int main(void) {
     printf("in cricle:%lu total:%lu PI = %lf\n", in_cir, total, PI);
     FILE*f = fopen("result.txt","a");
     fprintf(f, "%lf\n", PI);
-    fclose(f);
     return 0;
 }
