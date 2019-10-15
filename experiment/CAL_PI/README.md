@@ -1,3 +1,7 @@
+# CAL_PI:
+   - Calculate π with Monte-Cario algorithm.
+   - Usage: `run -br`
+
 ## Calculate π using Monte-Cario algorithm with multi threads
 
 - I created ten threads to generate 10000 points( so each thread generated 1000 points).

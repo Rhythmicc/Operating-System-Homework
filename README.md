@@ -1,19 +1,7 @@
 # Operating System Homework and experiment
 
-## osh
-   - Use `execvp`, `fork` and `waitpid` to implement command invocation
-    
-   - Usage:
-       - compile and run: `run -br`
-         - About `run`：you can get it from Pypi Library [Qpro](https://pypi.org/project/Qpro/) and search usage.
-         
-       | command | means |
-       |:---|:---|
-       |`osh>exit`| exit |
-       | `osh>!!` | view all command history |
-       |`osh>! <indx>`| view the \<indx\>th command in history|
+## 关于内置CLion(C/CPP Project)扩展工具
 
-## CAL_PI:
-   - Calculate $\pi$ with Monte-Cario algorithm.
-   - Usage:
-       - `run -br`
+| 安装 | `pip3 install Qpro` |
+| :----- | :----- |
+| 使用方法 | [Qpro使用方法](https://pypi.org/project/Qpro/) |
