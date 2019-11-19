@@ -108,18 +108,44 @@ void OPT(){
     free(cur_mem);
 }
 
+void CLOCK(){
+    int cur_mem[sz], use[sz], cnt = 0, row = 0;
+    memset(cur_mem,0, sizeof(cur_mem));
+    memset(use,0, sizeof(use));
+    for(int i=0;i<page_num;++i){
+        int idx = is_in_mem(cur_mem, page_data[i]);
+        if(!idx){
+            do{
+                if(use[row] == 0){
+                    for(int j=0;j<sz;++j)printf("%d ", cur_mem[j]);
+                    printf("%d [%d]\n", page_data[i], row);
+                    cur_mem[row] = page_data[i];
+                    use[row] = 1;
+                    idx = 1;
+                    ++cnt;
+                }
+                else use[row]=0;
+                ++row;
+                if(row == sz)row=0;
+            } while (!idx);
+        } else use[idx-1] = 1;
+    }
+    printf("[CLOCK] Total page fault:%d\n", cnt);
+}
+
 int menu(){
     draw_line();
     puts("1. FIFO");
     puts("2. LRU");
     puts("3. OPT");
+    puts("4. CLOCK");
     puts("0. exit");
     draw_line();
     int ch = 1;
     do{
         printf("Input your choice:");
     }
-    while (scanf("%d",&ch), ch<0 || ch>3);
+    while (scanf("%d",&ch), ch<0 || ch>4);
     return ch;
 }
 
@@ -139,6 +165,9 @@ int main(int argc, char **argv) {
                 break;
             case 3:
                 OPT();
+                break;
+            case 4:
+                CLOCK();
                 break;
             default:
                 break;

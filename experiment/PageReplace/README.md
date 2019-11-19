@@ -101,7 +101,7 @@ void LRU(){
 - OPT是一种理想算法，实际上不能实现，因为你无法预测后续要访问的页面数是什么。
 - OPT的算法思想是在页面冲突时，选择未来最长时间不被访问的或者以后永不使用的页面进行淘汰。
 
-```c
+```CQL
 int OPT_choose_row(int*cur_mem, int idx){ /// 计算最长不被访问的行，这个算法很低效。
     int row = 0, cnt = 0;
     for(int i=idx+1;i<page_num;++i){
@@ -141,61 +141,120 @@ void OPT(){
 }
 ```
 
+### CLOCK
+
+- CLOCK算法是给每一帧关联一个附加位，称为使用位。当某一页首次装入主存时，该帧的使用位设置为1;当该页随后再被访问到时，它的使用位也被置为1。对于页替换算法，用于替换的候选帧集合看做一个循环缓冲区，并且有一个指针与之相关联。当某一页被替换时，该指针被设置成指向缓冲区中的下一帧。当需要替换一页时，操作系统扫描缓冲区，以查找使用位被置为0的一帧。每当遇到一个使用位为1的帧时，操作系统就将该位重新置为0；如果在这个过程开始时，缓冲区中所有帧的使用位均为0，则选择遇到的第一个帧替换；如果所有帧的使用位均为1,则指针在缓冲区中完整地循环一周，把所有使用位都置为0，并且停留在最初的位置上，替换该帧中的页。
+
+```c
+void CLOCK(){
+    int cur_mem[sz], use[sz], cnt = 0, row = 0;
+    memset(cur_mem,0, sizeof(cur_mem));
+    memset(use,0, sizeof(use));
+    for(int i=0;i<page_num;++i){
+        int idx = is_in_mem(cur_mem, page_data[i]);
+        if(!idx){
+            do{
+                if(use[row] == 0){
+                    for(int j=0;j<sz;++j)printf("%d ", cur_mem[j]);
+                    printf("%d [%d]\n", page_data[i], row);
+                    cur_mem[row] = page_data[i];
+                    use[row] = 1;
+                    idx = 1;
+                    ++cnt;
+                }
+                else use[row]=0;
+                ++row;
+                if(row == sz)row=0;
+            } while (!idx);
+        } else use[idx-1] = 1;
+    }
+    printf("[CLOCK] Total page fault:%d\n", cnt);
+}
+```
+
+
+
 ###测试与输出
 
 ```text
 Input memory size and page number:3 10
 Auto generate data:
-3 9 3 6 8 3 5 6 9 5
+4 2 7 10 6 6 1 5 8 9
 ----------------------------------------
 1. FIFO
 2. LRU
 3. OPT
+4. CLOCK
 0. exit
 ----------------------------------------
 Input your choice:1
-0 0 0 3 [0]
-3 0 0 9 [1]
-3 9 0 6 [2]
-3 9 6 8 [0]
-8 9 6 3 [1]
-8 3 6 5 [2]
-8 3 5 6 [0]
-6 3 5 9 [1]
-[FIFO] Total page fault:8
+0 0 0 4 [0]
+4 0 0 2 [1]
+4 2 0 7 [2]
+4 2 7 10 [0]
+10 2 7 6 [1]
+10 6 7 1 [2]
+10 6 1 5 [0]
+5 6 1 8 [1]
+5 8 1 9 [2]
+[FIFO] Total page fault:9
 ----------------------------------------
 1. FIFO
 2. LRU
 3. OPT
+4. CLOCK
 0. exit
 ----------------------------------------
 Input your choice:2
-0 0 0 3 [0]
-3 0 0 9 [1]
-3 9 0 6 [2]
-3 9 6 8 [1]
-3 8 6 5 [2]
-3 8 5 6 [1]
-3 6 5 9 [0]
-[LRU] Total page fault:7
+0 0 0 4 [0]
+4 0 0 2 [1]
+4 2 0 7 [2]
+4 2 7 10 [0]
+10 2 7 6 [1]
+10 6 7 1 [2]
+10 6 1 5 [0]
+5 6 1 8 [1]
+5 8 1 9 [2]
+[LRU] Total page fault:9
 ----------------------------------------
 1. FIFO
 2. LRU
 3. OPT
+4. CLOCK
 0. exit
 ----------------------------------------
 Input your choice:3
-0 0 0 3 [0]
-3 0 0 9 [1]
-3 9 0 6 [2]
-3 9 6 8 [1]
-3 8 6 5 [0]
-5 8 6 9 [1]
-[OPT] Total page fault:6
+5 8 9 4 [2]
+5 8 4 2 [2]
+5 8 2 7 [2]
+5 8 7 10 [2]
+5 8 10 6 [2]
+5 8 6 1 [2]
+5 8 1 9 [0]
+[OPT] Total page fault:7
 ----------------------------------------
 1. FIFO
 2. LRU
 3. OPT
+4. CLOCK
+0. exit
+----------------------------------------
+Input your choice:4
+0 0 0 4 [0]
+4 0 0 2 [1]
+4 2 0 7 [2]
+4 2 7 10 [0]
+10 2 7 6 [1]
+10 6 7 1 [2]
+10 6 1 5 [0]
+5 6 1 8 [1]
+5 8 1 9 [2]
+[CLOCK] Total page fault:9
+----------------------------------------
+1. FIFO
+2. LRU
+3. OPT
+4. CLOCK
 0. exit
 ----------------------------------------
 Input your choice:0
@@ -204,55 +263,79 @@ Input your choice:0
 ```text
 Input memory size and page number:3 10
 Auto generate data:
-1 5 8 4 7 4 5 4 6 7
+9 3 6 6 6 7 8 9 10 4
 ----------------------------------------
 1. FIFO
 2. LRU
 3. OPT
+4. CLOCK
 0. exit
 ----------------------------------------
 Input your choice:1
-0 0 0 1 [0]
-1 0 0 5 [1]
-1 5 0 8 [2]
-1 5 8 4 [0]
-4 5 8 7 [1]
-4 7 8 5 [2]
-4 7 5 6 [0]
-[FIFO] Total page fault:7
+0 0 0 9 [0]
+9 0 0 3 [1]
+9 3 0 6 [2]
+9 3 6 7 [0]
+7 3 6 8 [1]
+7 8 6 9 [2]
+7 8 9 10 [0]
+10 8 9 4 [1]
+[FIFO] Total page fault:8
 ----------------------------------------
 1. FIFO
 2. LRU
 3. OPT
+4. CLOCK
 0. exit
 ----------------------------------------
 Input your choice:2
-0 0 0 1 [0]
-1 0 0 5 [1]
-1 5 0 8 [2]
-1 5 8 4 [0]
-4 5 8 7 [1]
-4 7 8 5 [2]
-4 7 5 6 [1]
-4 6 5 7 [2]
+0 0 0 9 [0]
+9 0 0 3 [1]
+9 3 0 6 [2]
+9 3 6 7 [0]
+7 3 6 8 [1]
+7 8 6 9 [2]
+7 8 9 10 [0]
+10 8 9 4 [1]
 [LRU] Total page fault:8
 ----------------------------------------
 1. FIFO
 2. LRU
 3. OPT
+4. CLOCK
 0. exit
 ----------------------------------------
 Input your choice:3
-4 6 7 1 [1]
-4 1 7 5 [1]
-4 5 7 8 [1]
-4 8 7 5 [1]
-4 5 7 6 [0]
-[OPT] Total page fault:5
+0 0 0 9 [0]
+9 0 0 3 [1]
+9 3 0 6 [1]
+9 6 0 7 [1]
+9 7 0 8 [1]
+9 8 0 10 [0]
+10 8 0 4 [0]
+[OPT] Total page fault:7
 ----------------------------------------
 1. FIFO
 2. LRU
 3. OPT
+4. CLOCK
+0. exit
+----------------------------------------
+Input your choice:4
+0 0 0 9 [0]
+9 0 0 3 [1]
+9 3 0 6 [2]
+9 3 6 7 [0]
+7 3 6 8 [1]
+7 8 6 9 [2]
+7 8 9 10 [0]
+10 8 9 4 [1]
+[CLOCK] Total page fault:8
+----------------------------------------
+1. FIFO
+2. LRU
+3. OPT
+4. CLOCK
 0. exit
 ----------------------------------------
 Input your choice:0
@@ -374,18 +457,44 @@ void OPT(){
     free(cur_mem);
 }
 
+void CLOCK(){
+    int cur_mem[sz], use[sz], cnt = 0, row = 0;
+    memset(cur_mem,0, sizeof(cur_mem));
+    memset(use,0, sizeof(use));
+    for(int i=0;i<page_num;++i){
+        int idx = is_in_mem(cur_mem, page_data[i]);
+        if(!idx){
+            do{
+                if(use[row] == 0){
+                    for(int j=0;j<sz;++j)printf("%d ", cur_mem[j]);
+                    printf("%d [%d]\n", page_data[i], row);
+                    cur_mem[row] = page_data[i];
+                    use[row] = 1;
+                    idx = 1;
+                    ++cnt;
+                }
+                else use[row]=0;
+                ++row;
+                if(row == sz)row=0;
+            } while (!idx);
+        } else use[idx-1] = 1;
+    }
+    printf("[CLOCK] Total page fault:%d\n", cnt);
+}
+
 int menu(){
     draw_line();
     puts("1. FIFO");
     puts("2. LRU");
     puts("3. OPT");
+    puts("4. CLOCK");
     puts("0. exit");
     draw_line();
     int ch = 1;
     do{
         printf("Input your choice:");
     }
-    while (scanf("%d",&ch), ch<0 || ch>3);
+    while (scanf("%d",&ch), ch<0 || ch>4);
     return ch;
 }
 
@@ -405,6 +514,9 @@ int main(int argc, char **argv) {
                 break;
             case 3:
                 OPT();
+                break;
+            case 4:
+                CLOCK();
                 break;
             default:
                 break;

@@ -12,9 +12,6 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="6b9230ef-5e82-4d51-a5f7-0f0b3d2a3b3e" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/experiment/webserver/exp2/template/exp2" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/experiment/webserver/exp2/template/exp3" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/CMakeLists.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cmake-build-debug/CMakeFiles/Makefile2" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/CMakeFiles/Makefile2" afterDir="false" />
@@ -26,10 +23,9 @@
       <change beforePath="$PROJECT_DIR$/cmake-build-debug/CMakeFiles/progress.marks" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/CMakeFiles/progress.marks" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cmake-build-debug/Makefile" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/Makefile" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cmake-build-debug/OS.cbp" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/OS.cbp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/experiment/webserver/exp2/webserver.c" beforeDir="false" afterPath="$PROJECT_DIR$/experiment/webserver/exp2/webserver.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/experiment/webserver/exp3/result.png" beforeDir="false" afterPath="$PROJECT_DIR$/experiment/webserver/exp3/result.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/experiment/webserver/exp3/webserver.c" beforeDir="false" afterPath="$PROJECT_DIR$/experiment/webserver/exp3/webserver.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/experiment/webserver/exp3/webtest.py" beforeDir="false" afterPath="$PROJECT_DIR$/experiment/webserver/exp3/webtest.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/experiment/PageReplace/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/experiment/PageReplace/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/experiment/PageReplace/dist/PageReplace" beforeDir="false" afterPath="$PROJECT_DIR$/experiment/PageReplace/dist/PageReplace" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/experiment/PageReplace/main.c" beforeDir="false" afterPath="$PROJECT_DIR$/experiment/PageReplace/main.c" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -124,7 +120,8 @@
       <workItem from="1573008298382" duration="965000" />
       <workItem from="1574129418884" duration="6037000" />
       <workItem from="1574140486458" duration="1198000" />
-      <workItem from="1574157526252" duration="8505000" />
+      <workItem from="1574157526252" duration="8569000" />
+      <workItem from="1574179415301" duration="1527000" />
     </task>
     <task id="LOCAL-00001" summary="first commit">
       <created>1569337141862</created>
@@ -280,7 +277,14 @@
       <option name="project" value="LOCAL" />
       <updated>1574157626834</updated>
     </task>
-    <option name="localTasksCounter" value="23" />
+    <task id="LOCAL-00023" summary="update web server experiment">
+      <created>1574168524827</created>
+      <option name="number" value="00023" />
+      <option name="presentableId" value="LOCAL-00023" />
+      <option name="project" value="LOCAL" />
+      <updated>1574168524827</updated>
+    </task>
+    <option name="localTasksCounter" value="24" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -307,6 +311,7 @@
     <MESSAGE value="update banker's algorithm" />
     <MESSAGE value="PageReplace" />
     <MESSAGE value="add web server experiment" />
-    <option name="LAST_COMMIT_MESSAGE" value="add web server experiment" />
+    <MESSAGE value="update web server experiment" />
+    <option name="LAST_COMMIT_MESSAGE" value="update web server experiment" />
   </component>
 </project>
