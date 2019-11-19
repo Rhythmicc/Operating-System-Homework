@@ -1,13 +1,15 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include <pthread.h>
-#define NUM_CUSTOMERS 5
-#define NUM_RESOURCES 3
-int curr[NUM_CUSTOMERS][NUM_RESOURCES];
-int max_need[NUM_CUSTOMERS][NUM_RESOURCES];
-int finish[NUM_CUSTOMERS];
-int max_res[NUM_RESOURCES];
-int avail[NUM_RESOURCES];
+#define maxp 105
+#define maxr 105
+int NUM_CUSTOMERS;
+int NUM_RESOURCES;
+int curr[maxp][maxr];
+int max_need[maxp][maxr];
+int finish[maxp];
+int max_res[maxr];
+int avail[maxr];
 pthread_mutex_t mutex;
 
 void cur_state(){
@@ -66,6 +68,8 @@ void* Banker(void* Pid){
 int main(){
     pthread_t tid[NUM_CUSTOMERS];
     pthread_attr_t attr;
+    puts("Number of process and resource:");
+    scanf("%d%d",&NUM_CUSTOMERS, &NUM_RESOURCES);
     puts("Give the max number of each resources:");
     for (int i=0;i<NUM_RESOURCES;++i)scanf("%d", max_res+i);
     puts("Give the number of available resources:");

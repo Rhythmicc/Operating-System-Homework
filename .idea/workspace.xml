@@ -12,29 +12,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="6b9230ef-5e82-4d51-a5f7-0f0b3d2a3b3e" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/Banker.tar.gz" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Banker.zip" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Banker/1.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Banker/README.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Banker/README.pdf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Banker/dist/Banker" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Banker/dist/input.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Banker/main.c" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Banker/out.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Banker/project_configure.csv" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Banker/template/main" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmake-build-debug/CMakeCache.txt" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/CMakeCache.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmake-build-debug/CMakeFiles/Makefile.cmake" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/CMakeFiles/Makefile.cmake" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmake-build-debug/CMakeFiles/Makefile2" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/CMakeFiles/Makefile2" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmake-build-debug/CMakeFiles/OS.dir/build.make" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/CMakeFiles/OS.dir/build.make" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmake-build-debug/CMakeFiles/clion-log.txt" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/CMakeFiles/clion-log.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmake-build-debug/Makefile" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/Makefile" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmake-build-debug/OS" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/OS" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmake-build-debug/input.txt" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/input.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.c" beforeDir="false" afterPath="$PROJECT_DIR$/main.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/project_configure.csv" beforeDir="false" afterPath="$PROJECT_DIR$/project_configure.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/template/main" beforeDir="false" afterPath="$PROJECT_DIR$/template/main" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/experiment/Banker/1.png" beforeDir="false" afterPath="$PROJECT_DIR$/experiment/Banker/1.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/experiment/Banker/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/experiment/Banker/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/experiment/Banker/dist/Banker" beforeDir="false" afterPath="$PROJECT_DIR$/experiment/Banker/dist/Banker" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/experiment/Banker/dist/input.txt" beforeDir="false" afterPath="$PROJECT_DIR$/experiment/Banker/dist/input.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/experiment/Banker/main.c" beforeDir="false" afterPath="$PROJECT_DIR$/experiment/Banker/main.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/experiment/Banker/out.txt" beforeDir="false" afterPath="$PROJECT_DIR$/experiment/Banker/out.txt" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -125,7 +109,8 @@
       <workItem from="1572777256004" duration="5000" />
       <workItem from="1572855134094" duration="16000" />
       <workItem from="1572885495040" duration="100000" />
-      <workItem from="1572919321433" duration="6139000" />
+      <workItem from="1572919321433" duration="6195000" />
+      <workItem from="1573008298382" duration="965000" />
     </task>
     <task id="LOCAL-00001" summary="first commit">
       <created>1569337141862</created>
@@ -253,7 +238,14 @@
       <option name="project" value="LOCAL" />
       <updated>1571121769751</updated>
     </task>
-    <option name="localTasksCounter" value="19" />
+    <task id="LOCAL-00019" summary="update banker's algorithm">
+      <created>1572926205458</created>
+      <option name="number" value="00019" />
+      <option name="presentableId" value="LOCAL-00019" />
+      <option name="project" value="LOCAL" />
+      <updated>1572926205458</updated>
+    </task>
+    <option name="localTasksCounter" value="20" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -277,6 +269,7 @@
     <MESSAGE value="first commit" />
     <MESSAGE value="add datum" />
     <MESSAGE value="update" />
-    <option name="LAST_COMMIT_MESSAGE" value="update" />
+    <MESSAGE value="update banker's algorithm" />
+    <option name="LAST_COMMIT_MESSAGE" value="update banker's algorithm" />
   </component>
 </project>

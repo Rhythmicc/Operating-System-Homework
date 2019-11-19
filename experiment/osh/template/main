@@ -96,7 +96,7 @@ pid_t execute(char*args[], int background) {
         return -1;
     } else if (!pid) {
         int res = execvp(args[0], args);
-        if (res)printf("Execute failed with exit code: %d\n", res);
+        if (res)puts("Execute failed");
         exit(res);
     } else if (!background) {
         waitpid(pid,NULL,WCONTINUED);
@@ -110,7 +110,6 @@ pid_t mainloop() {
     if(pid==0){
         /// Init
         char *args[MAX_LINE / 2 + 1];    /* command line (of 80) has max of 40 arguments */
-        memset(args, 0, sizeof(args));
         int has_alloc[MAX_LINE / 2 + 1];
         memset(has_alloc, 0, sizeof(has_alloc));
         sstream *stream = newSstream(1005);
@@ -141,11 +140,9 @@ pid_t mainloop() {
                 strcpy(args[tail], argv);
                 ++tail;
             } /// split command
-            if(has_alloc[tail] || args[tail]){
-                free(args[tail]);
-                args[tail] = NULL;
-                has_alloc[tail] = 0;
-            }
+            free(args[tail]);
+            args[tail] = NULL;
+            has_alloc[tail] = 0;
             if (!strcmp(args[0], "exit"))should_run = 0; /// exit
             else if (!strcmp(argv, "!!")) { /// view all history
                 if (ls.tail)for (i = 0; i < ls.tail; ++i)printf("%d %s", i + 1, ls.v[i]);

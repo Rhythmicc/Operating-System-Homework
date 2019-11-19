@@ -11,7 +11,7 @@
 
   程序将会被编译, 并使用 `dist/input.txt` 作为输入来运行.
   
-- 你可以在[Qpro](https://pypi.org/project/Qpro/)查看关于Qpro的各种使用方法.
+- 可以在[Qpro](https://pypi.org/project/Qpro/)查看关于Qpro的各种使用方法.
 
 
 
@@ -125,6 +125,7 @@
 ## 程序输出
 
 ```
+Number of process and resource:
 Give the max number of each resources:
 Give the number of available resources:
 Give the current allocation of each process:
@@ -156,62 +157,62 @@ p5	4	3	1
 
 Start the Banker's algorithm
 
-Process p4 is allocated with: 0 1 1 
-p4 has done!
+Process p2 is allocated with: 1 2 2 
+p2 has done!
 
 ---------------------------------
-Current available resources: 5 4 3
+Current available resources: 5 3 2
 
 Current max_need table:
 7	5	3
-3	2	2
-9	0	2
 0	0	0
+9	0	2
+2	2	2
 4	3	3
 
 Current allocation table:
 p1	0	1	0
-p2	2	0	0
+p2	0	0	0
 p3	3	0	2
-p4	0	0	0
+p4	2	1	1
 p5	0	0	2
 
 Current need table:
 p1	7	4	3
-p2	1	2	2
+p2	0	0	0
 p3	6	0	0
-p4	0	0	0
+p4	0	1	1
 p5	4	3	1
 
 Process p5 is allocated with: 4 3 1 
 p5 has done!
 
 ---------------------------------
-Current available resources: 5 4 5
+Current available resources: 5 3 4
 
 Current max_need table:
 7	5	3
-3	2	2
-9	0	2
 0	0	0
+9	0	2
+2	2	2
 0	0	0
 
 Current allocation table:
 p1	0	1	0
-p2	2	0	0
+p2	0	0	0
 p3	3	0	2
-p4	0	0	0
+p4	2	1	1
 p5	0	0	0
 
 Current need table:
 p1	7	4	3
-p2	1	2	2
+p2	0	0	0
 p3	6	0	0
-p4	0	0	0
+p4	0	1	1
 p5	0	0	0
 
-Process p2 is allocated with: 1 2 2 
-p2 has done!
+Process p4 is allocated with: 0 1 1 
+p4 has done!
 
 ---------------------------------
 Current available resources: 7 4 5
@@ -306,3 +307,4 @@ All processes have finished
 ## 感想:
 
 通过本次实验我理解了银行家算法的具体实现, 和大致流程.
+
