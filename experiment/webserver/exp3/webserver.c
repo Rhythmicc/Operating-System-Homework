@@ -26,7 +26,6 @@
 #define RMALLOC(type,n) (type*)malloc(sizeof(type)*(n))
 #define MALLOC(p,type,n) type*p = RMALLOC(type, n)
 
-double sum_time = 0;
 struct {
     char *ext;
     char *filetype;
@@ -44,8 +43,8 @@ struct {
         {0,      0}
 };
 double read_soc, post_dt, read_web, write_log;
-unsigned int total;
-pthread_mutex_t rs,pd,rw,wl;
+unsigned int total, tol_log = 0;
+pthread_mutex_t rs,wl;
 
 void time_to_str(char*res){
     time_t t;
@@ -111,6 +110,7 @@ void logger(int type, char *s1, char *s2, int socket_fd) {
     }
     gettimeofday(&t2,NULL);
     pthread_mutex_lock(&wl);
+    ++tol_log;
     write_log += (t2.tv_sec - t1.tv_sec) * 1000.0 + (t2.tv_usec - t1.tv_usec) / 1000.0;
     pthread_mutex_unlock(&wl);
 }
@@ -126,21 +126,18 @@ typedef struct {
 
 void* web(void*data) {
     webparam*p = (webparam*)data;
-    int fd = p->fd, hit = p->hit;
+    int fd = p->fd, hit = p->hit, file_fd, buflen;
     struct timeval*delay = p->delay;
-    long ret;
+    long i, j, len, ret;
     static char buffer[BUFSIZE + 1]; /* 设置静态缓冲区 */
     ret = read(fd, buffer, BUFSIZE);
     struct timeval t1, t2;
-    int file_fd, buflen;
+    double deal, find;
     char *fstr;
-    long i, j, len;
     gettimeofday(&t1, NULL);
     /* 从连接通道中读取客户端的请求消息 */
-    if (ret == 0 || ret == -1) { //如果读取客户端消息失败，则向客户端发送 HTTP 失败响应信息
+    if (ret == 0 || ret == -1)  //如果读取客户端消息失败，则向客户端发送 HTTP 失败响应信息
         logger(FORBIDDEN, "failed to read browser request", "", fd);
-        puts("failed to read browser request");
-    }
     if (ret > 0 && ret < BUFSIZE) buffer[ret] = 0;
     else buffer[0] = 0;
     for (i = 0; i < ret; i++) /* 移除消息字符串中的“CF”和“LF”字符*/
@@ -150,7 +147,6 @@ void* web(void*data) {
 /*判断客户端 HTTP 请求消息是否为 GET 类型，如果不是则给出相应的响应消息*/
     if (strncmp(buffer, "GET ", 4) && strncmp(buffer, "get ", 4)) {
         logger(FORBIDDEN, "Only simple GET operation supported", buffer, fd);
-        puts("Only simple GET operation supported");
     }
     for (i = 4; i < BUFSIZE; i++) { /* null terminate after the second space to ignore extra stuff */
         if (buffer[i] == ' ') { /* string is "GET URL " +lots of other stuff */
@@ -159,16 +155,12 @@ void* web(void*data) {
         }
     }
     gettimeofday(&t2, NULL);
-    pthread_mutex_lock(&rs);
-    read_soc += (t2.tv_sec - t1.tv_sec) * 1000.0 + (t2.tv_usec - t1.tv_usec) / 1000.0;
-    pthread_mutex_unlock(&rs);
+    deal = (t2.tv_sec - t1.tv_sec) * 1000.0 + (t2.tv_usec - t1.tv_usec) / 1000.0;
     gettimeofday(&t1, NULL);
     for (j = 0; j < i - 1; j++)
 /* 在消息中检测路径，不允许路径中出现“.” */
-        if (buffer[j] == '.' && buffer[j + 1] == '.') {
+        if (buffer[j] == '.' && buffer[j + 1] == '.')
             logger(FORBIDDEN, "Parent directory (..) path names not supported", buffer, fd);
-            puts("Parent directory (..) path names not supported");
-        }
     if (!strncmp(&buffer[0], "GET /\0", 6) || !strncmp(&buffer[0], "get /\0", 6))
 /* 如果请求消息中没有包含有效的文件名，则使用默认的文件名 index.html */
         (void) strcpy(buffer, "GET /index.html");
@@ -184,12 +176,9 @@ void* web(void*data) {
     }
     if (fstr == 0){
         logger(FORBIDDEN, "file extension type not supported", buffer, fd);
-        puts("file extension type not supported");
     }
     gettimeofday(&t2, NULL);
-    pthread_mutex_lock(&rw);
-    read_web += (t2.tv_sec - t1.tv_sec) * 1000.0 + (t2.tv_usec - t1.tv_usec) / 1000.0;
-    pthread_mutex_unlock(&rw);
+    find = (t2.tv_sec - t1.tv_sec) * 1000.0 + (t2.tv_usec - t1.tv_usec) / 1000.0;
     gettimeofday(&t1, NULL);
     if ((file_fd = open(&buffer[5], O_RDONLY)) == -1) { /* 打开指定的文件名*/
         logger(NOTFOUND, "failed to open file", &buffer[5], fd);
@@ -209,20 +198,22 @@ void* web(void*data) {
     select(0, NULL, NULL, NULL, delay);
     close(fd);
     gettimeofday(&t2, NULL);
-    pthread_mutex_lock(&pd);
+    pthread_mutex_lock(&rs);
+    read_soc += deal;
+    read_web += find;
     post_dt += (t2.tv_sec - t1.tv_sec) * 1000.0 + (t2.tv_usec - t1.tv_usec) / 1000.0;
-    pthread_mutex_unlock(&pd);
+    pthread_mutex_unlock(&rs);
     free(p);
     return NULL;
 }
 
 static void del_sig(int sig){
-    puts("catch and done!\n");
+    puts("\n");
     printf("Total requests:\t%u\n", total);
-    printf("read socket:\t%4.2fms\n", read_soc);
-    printf("raed web:\t%4.2fms\n", read_web);
-    printf("post data:\t%4.2fms\n", post_dt);
-    printf("write log:\t%4.2fms\n", write_log);
+    printf("read socket:\t%4.2fms/time\n", read_soc / total);
+    printf("read web:\t%4.2fms/time\n", read_web / total);
+    printf("post data:\t%4.2fms/time\n", post_dt / total);
+    printf("write log:\t%4.2fms/time\n", write_log / tol_log);
     exit(0);
 }
 
@@ -280,8 +271,6 @@ int main(int argc, char **argv) {
     delay.tv_sec = 0;
     delay.tv_usec = 100;
     pthread_mutex_init(&rs,NULL);
-    pthread_mutex_init(&pd,NULL);
-    pthread_mutex_init(&rw,NULL);
     pthread_mutex_init(&wl,NULL);
     for (hit = 1;; ++hit) {
         length = sizeof(cli_addr);
@@ -294,9 +283,6 @@ int main(int argc, char **argv) {
         param->fd = socketfd;
         param->hit = hit;
         param->delay = &delay;
-        if(pthread_create(&pth, &attr, web, (void*)param)<0){
-            logger(ERROR, "system call", "pthread_create", 0);
-            puts("failed with thread create!");
-        }
+        if(pthread_create(&pth, &attr, web, (void*)param)<0)logger(ERROR, "system call", "pthread_create", 0);
     }
 }

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import requests
 import threading
-from time import perf_counter
+from time import perf_counter, sleep
 import matplotlib.pyplot as plt
 import sys
 import numpy as np
@@ -27,10 +27,9 @@ class HttpLoad(threading.Thread):
                     status[res.status_code] = 0
                     use_time[res.status_code] = []
                 status[res.status_code] += 1
-                use_time[res.status_code].append(round(end - start, 3))
+                use_time[res.status_code].append(end - start)
                 mutex.release()
-            except Exception as e:
-                print(e)
+            except Exception as Ignored:
                 mutex.acquire()
                 if 'failed' not in status:
                     status['failed'] = 0
@@ -40,26 +39,28 @@ class HttpLoad(threading.Thread):
 
 if __name__ == '__main__':
     target = 'http://10.3.40.47:9168'
-    #target = 'https://www.baidu.com'
+    # target = 'https://www.baidu.com'
     mutex = threading.Lock()
     tls = []
-    num_thread = int(sys.argv[1])
-    num_post = int(sys.argv[2])
+    try:
+        num_thread = int(sys.argv[1])
+        num_post = int(sys.argv[2]) // num_thread
+    except IndexError:
+        num_thread = 5
+        num_post = 10
     for i in range(num_thread):
         tls.append(HttpLoad(num_post, target))
         tls[-1].start()
     for i in tls:
         i.join()
-    print("http status:", status)
-    print("use time: {")
+    print("http status:\t", status)
     for i in use_time:
-        print('\t%s:' % i, use_time[i])
-    print('}')
-    for st in use_time:
-        x = np.arange(1, status[st] + 1)
-        plt.plot(x, use_time[st], label=str(st))
-        plt.scatter(x, use_time[st])
-    plt.legend(loc='best')
-    plt.title('result')
-    plt.savefig('result.png')
+        use_time[i] = round(sum(use_time[i]) / len(use_time[i]), 3)
+    print("ms/time:\t", use_time)
+    labels = status.keys()
+    sizes = status.values()
+    explore = [0.1 if i == 200 else 0.0 for i in labels]
+    plt.pie(sizes, labels=labels, autopct='%1.2f%%', explode=explore, shadow=True)
+    plt.title(' ,'.join(['%s: %.3f ms/time' % (i, use_time[i]) for i in use_time]))
+    plt.savefig('result.png', dpi=300, bbox_inches='tight')
     plt.show()
