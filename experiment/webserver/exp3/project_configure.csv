@@ -1,0 +1,6 @@
+compile_tool,gcc -O3, -lpthread
+compile_filename,webserver.c
+executable_filename,dist/exp3
+input_file,dist/input.txt
+template_root,template/
+server_target,2017011344@10.3.40.47:webserver/

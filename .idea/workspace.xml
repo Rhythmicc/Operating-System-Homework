@@ -11,17 +11,7 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6b9230ef-5e82-4d51-a5f7-0f0b3d2a3b3e" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/experiment/PageReplace/README.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/experiment/PageReplace/dist/PageReplace" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/experiment/PageReplace/dist/input.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/experiment/PageReplace/main.c" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/experiment/PageReplace/project_configure.csv" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/experiment/PageReplace/template/main" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmake-build-debug/CMakeFiles/OS.dir/depend.make" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/CMakeFiles/OS.dir/depend.make" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmake-build-debug/OS" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/OS" afterDir="false" />
-    </list>
+    <list default="true" id="6b9230ef-5e82-4d51-a5f7-0f0b3d2a3b3e" name="Default Changelist" comment="" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -114,7 +104,7 @@
       <workItem from="1572919321433" duration="6195000" />
       <workItem from="1573008298382" duration="965000" />
       <workItem from="1574129418884" duration="6037000" />
-      <workItem from="1574140486458" duration="1163000" />
+      <workItem from="1574140486458" duration="1198000" />
     </task>
     <task id="LOCAL-00001" summary="first commit">
       <created>1569337141862</created>
@@ -256,7 +246,14 @@
       <option name="project" value="LOCAL" />
       <updated>1574129433182</updated>
     </task>
-    <option name="localTasksCounter" value="21" />
+    <task id="LOCAL-00021" summary="PageReplace">
+      <created>1574142336595</created>
+      <option name="number" value="00021" />
+      <option name="presentableId" value="LOCAL-00021" />
+      <option name="project" value="LOCAL" />
+      <updated>1574142336595</updated>
+    </task>
+    <option name="localTasksCounter" value="22" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -281,6 +278,7 @@
     <MESSAGE value="add datum" />
     <MESSAGE value="update" />
     <MESSAGE value="update banker's algorithm" />
-    <option name="LAST_COMMIT_MESSAGE" value="update banker's algorithm" />
+    <MESSAGE value="PageReplace" />
+    <option name="LAST_COMMIT_MESSAGE" value="PageReplace" />
   </component>
 </project>
