@@ -260,6 +260,7 @@ int main(int argc, char **argv) {
     delay.tv_usec = 100;
     if (fork() == 0) {
         signal(SIGINT, del_sig);
+        memset(sum_time, 0, sizeof(sum_time));
         char info[105];
         double deal, find, post;
         printf("listener pid: %d\n", getpid());
@@ -274,6 +275,7 @@ int main(int argc, char **argv) {
                 sum_time[0] += deal;
                 sum_time[1] += find;
                 sum_time[2] += post;
+                ++total;
             }
         }
     } else {
@@ -283,7 +285,6 @@ int main(int argc, char **argv) {
                 logger(ERROR, "system call", "accept", 0, fds);
                 continue;
             }
-            ++total;
             web(socketfd, hit, &delay, fds);
         }
     }

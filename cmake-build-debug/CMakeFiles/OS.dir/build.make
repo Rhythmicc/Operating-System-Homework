@@ -83,49 +83,19 @@ CMakeFiles/OS.dir/experiment/webserver/exp3/webserver.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/OS.dir/experiment/webserver/exp3/webserver.c.s"
 	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /Users/lianhaocheng/CLionProjects/OS/experiment/webserver/exp3/webserver.c -o CMakeFiles/OS.dir/experiment/webserver/exp3/webserver.c.s
 
-CMakeFiles/OS.dir/experiment/webserver/exp2/webserver.c.o: CMakeFiles/OS.dir/flags.make
-CMakeFiles/OS.dir/experiment/webserver/exp2/webserver.c.o: ../experiment/webserver/exp2/webserver.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/lianhaocheng/CLionProjects/OS/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building C object CMakeFiles/OS.dir/experiment/webserver/exp2/webserver.c.o"
-	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/OS.dir/experiment/webserver/exp2/webserver.c.o   -c /Users/lianhaocheng/CLionProjects/OS/experiment/webserver/exp2/webserver.c
-
-CMakeFiles/OS.dir/experiment/webserver/exp2/webserver.c.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/OS.dir/experiment/webserver/exp2/webserver.c.i"
-	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /Users/lianhaocheng/CLionProjects/OS/experiment/webserver/exp2/webserver.c > CMakeFiles/OS.dir/experiment/webserver/exp2/webserver.c.i
-
-CMakeFiles/OS.dir/experiment/webserver/exp2/webserver.c.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/OS.dir/experiment/webserver/exp2/webserver.c.s"
-	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /Users/lianhaocheng/CLionProjects/OS/experiment/webserver/exp2/webserver.c -o CMakeFiles/OS.dir/experiment/webserver/exp2/webserver.c.s
-
-CMakeFiles/OS.dir/experiment/PageReplace/main.c.o: CMakeFiles/OS.dir/flags.make
-CMakeFiles/OS.dir/experiment/PageReplace/main.c.o: ../experiment/PageReplace/main.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/lianhaocheng/CLionProjects/OS/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building C object CMakeFiles/OS.dir/experiment/PageReplace/main.c.o"
-	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/OS.dir/experiment/PageReplace/main.c.o   -c /Users/lianhaocheng/CLionProjects/OS/experiment/PageReplace/main.c
-
-CMakeFiles/OS.dir/experiment/PageReplace/main.c.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/OS.dir/experiment/PageReplace/main.c.i"
-	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /Users/lianhaocheng/CLionProjects/OS/experiment/PageReplace/main.c > CMakeFiles/OS.dir/experiment/PageReplace/main.c.i
-
-CMakeFiles/OS.dir/experiment/PageReplace/main.c.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/OS.dir/experiment/PageReplace/main.c.s"
-	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /Users/lianhaocheng/CLionProjects/OS/experiment/PageReplace/main.c -o CMakeFiles/OS.dir/experiment/PageReplace/main.c.s
-
 # Object files for target OS
 OS_OBJECTS = \
 "CMakeFiles/OS.dir/main.c.o" \
-"CMakeFiles/OS.dir/experiment/webserver/exp3/webserver.c.o" \
-"CMakeFiles/OS.dir/experiment/webserver/exp2/webserver.c.o" \
-"CMakeFiles/OS.dir/experiment/PageReplace/main.c.o"
+"CMakeFiles/OS.dir/experiment/webserver/exp3/webserver.c.o"
 
 # External object files for target OS
 OS_EXTERNAL_OBJECTS =
 
 OS: CMakeFiles/OS.dir/main.c.o
 OS: CMakeFiles/OS.dir/experiment/webserver/exp3/webserver.c.o
-OS: CMakeFiles/OS.dir/experiment/webserver/exp2/webserver.c.o
-OS: CMakeFiles/OS.dir/experiment/PageReplace/main.c.o
 OS: CMakeFiles/OS.dir/build.make
 OS: CMakeFiles/OS.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/Users/lianhaocheng/CLionProjects/OS/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Linking C executable OS"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/Users/lianhaocheng/CLionProjects/OS/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Linking C executable OS"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/OS.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.
