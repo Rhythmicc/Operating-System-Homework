@@ -114,7 +114,7 @@ void logger(int type, char *s1, char *s2, int socket_fd, int*fp) {
 件名，然后根据文件名从本地将此文件读入缓存，并生成相应的 HTTP 响应消息；最后通过服务器与客户
 端的 socket 通道向客户端返回 HTTP 响应消息*/
 
-void web(int fd, int hit, struct timeval*delay, int *fp) {
+void web(int fd, int hit, int *fp) {
     long ret;
     static char buffer[BUFSIZE + 1]; /* 设置静态缓冲区 */
     ret = read(fd, buffer, BUFSIZE);
@@ -187,7 +187,8 @@ void web(int fd, int hit, struct timeval*delay, int *fp) {
         while ((ret = read(file_fd, buffer, BUFSIZE)) > 0) {
             (void) write(fd, buffer, ret);
         }
-        select(0, NULL, NULL, NULL, delay);
+        usleep(1000);
+        close(file_fd);
         close(fd);
         gettimeofday(&t2, NULL);
         //printf("post message, with %.2fms\n", (t2.tv_sec - t1.tv_sec) * 1000.0 + (t2.tv_usec - t1.tv_usec) / 1000.0);
@@ -255,9 +256,6 @@ int main(int argc, char **argv) {
         logger(ERROR, "system call", "bind", 0, fds);
     if (listen(listenfd, 64) < 0)
         logger(ERROR, "system call", "listen", 0, fds);
-    struct timeval delay;
-    delay.tv_sec = 0;
-    delay.tv_usec = 100;
     if (fork() == 0) {
         signal(SIGINT, del_sig);
         memset(sum_time, 0, sizeof(sum_time));
@@ -285,7 +283,7 @@ int main(int argc, char **argv) {
                 logger(ERROR, "system call", "accept", 0, fds);
                 continue;
             }
-            web(socketfd, hit, &delay, fds);
+            web(socketfd, hit, fds);
         }
     }
 }

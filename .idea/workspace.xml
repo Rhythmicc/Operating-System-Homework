@@ -12,7 +12,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="6b9230ef-5e82-4d51-a5f7-0f0b3d2a3b3e" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/experiment/webserver/exp3/template/exp3" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/experiment/webserver/exp3/img/1.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/experiment/webserver/exp3/img/2.png" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/CMakeLists.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cmake-build-debug/CMakeFiles/Makefile2" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/CMakeFiles/Makefile2" afterDir="false" />
@@ -24,9 +25,11 @@
       <change beforePath="$PROJECT_DIR$/cmake-build-debug/CMakeFiles/progress.marks" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/CMakeFiles/progress.marks" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cmake-build-debug/Makefile" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/Makefile" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cmake-build-debug/OS.cbp" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/OS.cbp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/experiment/webserver/exp2/template/exp3" beforeDir="false" afterPath="$PROJECT_DIR$/experiment/webserver/exp2/template/exp3" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/experiment/webserver/exp3/result.png" beforeDir="false" afterPath="$PROJECT_DIR$/experiment/webserver/exp3/result.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/experiment/webserver/exp2/webserver.c" beforeDir="false" afterPath="$PROJECT_DIR$/experiment/webserver/exp2/webserver.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/experiment/webserver/exp3/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/experiment/webserver/exp3/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/experiment/webserver/exp3/result.png" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/experiment/webserver/exp3/webserver.c" beforeDir="false" afterPath="$PROJECT_DIR$/experiment/webserver/exp3/webserver.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/experiment/webserver/exp3/webtest.py" beforeDir="false" afterPath="$PROJECT_DIR$/experiment/webserver/exp3/webtest.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -123,7 +126,7 @@
       <workItem from="1574140486458" duration="1198000" />
       <workItem from="1574157526252" duration="8569000" />
       <workItem from="1574179415301" duration="3010000" />
-      <workItem from="1574255949318" duration="1221000" />
+      <workItem from="1574255949318" duration="9006000" />
     </task>
     <task id="LOCAL-00001" summary="first commit">
       <created>1569337141862</created>
@@ -293,7 +296,14 @@
       <option name="project" value="LOCAL" />
       <updated>1574181482364</updated>
     </task>
-    <option name="localTasksCounter" value="25" />
+    <task id="LOCAL-00025" summary="update page replace">
+      <created>1574259421296</created>
+      <option name="number" value="00025" />
+      <option name="presentableId" value="LOCAL-00025" />
+      <option name="project" value="LOCAL" />
+      <updated>1574259421296</updated>
+    </task>
+    <option name="localTasksCounter" value="26" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

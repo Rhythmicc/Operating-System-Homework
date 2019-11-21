@@ -7,7 +7,6 @@
 #include <signal.h>
 #include <sys/types.h>
 #include <sys/time.h>
-#include <sys/msg.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
@@ -121,15 +120,13 @@ void logger(int type, char *s1, char *s2, int socket_fd) {
 
 typedef struct {
     int fd,hit;
-    struct timeval*delay;
 }webparam;
 
 void* web(void*data) {
-    webparam*p = (webparam*)data;
+    webparam *p = (webparam *) data;
     int fd = p->fd, hit = p->hit, file_fd, buflen;
-    struct timeval*delay = p->delay;
     long i, j, len, ret;
-    static char buffer[BUFSIZE + 1]; /* 设置静态缓冲区 */
+    char buffer[BUFSIZE + 1];
     ret = read(fd, buffer, BUFSIZE);
     struct timeval t1, t2;
     double deal, find;
@@ -174,9 +171,7 @@ void* web(void*data) {
             break;
         }
     }
-    if (fstr == 0){
-        logger(FORBIDDEN, "file extension type not supported", buffer, fd);
-    }
+    if (fstr == 0)logger(FORBIDDEN, "file extension type not supported", buffer, fd);
     gettimeofday(&t2, NULL);
     find = (t2.tv_sec - t1.tv_sec) * 1000.0 + (t2.tv_usec - t1.tv_usec) / 1000.0;
     gettimeofday(&t1, NULL);
@@ -195,7 +190,8 @@ void* web(void*data) {
     while ((ret = read(file_fd, buffer, BUFSIZE)) > 0) {
         (void) write(fd, buffer, ret);
     }
-    select(0, NULL, NULL, NULL, delay);
+    usleep(1000);
+    close(file_fd);
     close(fd);
     gettimeofday(&t2, NULL);
     pthread_mutex_lock(&rs);
@@ -267,9 +263,6 @@ int main(int argc, char **argv) {
     if (listen(listenfd, 64) < 0)
         logger(ERROR, "system call", "listen", 0);
     signal(SIGINT, del_sig);
-    struct timeval delay;
-    delay.tv_sec = 0;
-    delay.tv_usec = 100000;
     pthread_mutex_init(&rs,NULL);
     pthread_mutex_init(&wl,NULL);
     for (hit = 1;; ++hit) {
@@ -282,7 +275,6 @@ int main(int argc, char **argv) {
         MALLOC(param, webparam, 1);
         param->fd = socketfd;
         param->hit = hit;
-        param->delay = &delay;
         if(pthread_create(&pth, &attr, web, (void*)param)<0)logger(ERROR, "system call", "pthread_create", 0);
     }
 }

@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
 import requests
 import threading
-from time import perf_counter, sleep
+from time import perf_counter
 import matplotlib.pyplot as plt
 import sys
-import numpy as np
 
 status = {}
 use_time = {}
@@ -17,6 +16,7 @@ class HttpLoad(threading.Thread):
         self.target = url
 
     def run(self):
+        global status, use_time
         for req in range(self.cnt):
             try:
                 start = perf_counter()
@@ -54,9 +54,12 @@ if __name__ == '__main__':
     for i in tls:
         i.join()
     print("http status:\t", status)
+    tol_time = 0
     for i in use_time:
+        tol_time += sum(use_time[i])
         use_time[i] = round(sum(use_time[i]) / len(use_time[i]), 3)
     print("ms/time:\t", use_time)
+    print('Total use time: %.4f ms' % tol_time)
     labels = status.keys()
     sizes = status.values()
     explore = [0.1 if i == 200 else 0.0 for i in labels]
