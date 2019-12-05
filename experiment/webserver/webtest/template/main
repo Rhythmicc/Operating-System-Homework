@@ -17,10 +17,11 @@ class HttpLoad(threading.Thread):
 
     def run(self):
         global status, use_time
+        import random
         for req in range(self.cnt):
             try:
                 start = perf_counter()
-                res = requests.get(self.target)
+                res = requests.get(self.target + '/%d.html' % random.randint(0, 100000))
                 end = perf_counter()
                 mutex.acquire()
                 if res.status_code not in status:
@@ -39,7 +40,7 @@ class HttpLoad(threading.Thread):
 
 if __name__ == '__main__':
     target = 'http://10.3.40.47:9168'
-    # target = 'https://www.baidu.com'
+    #target = 'https://www.baidu.com'
     mutex = threading.Lock()
     tls = []
     try:

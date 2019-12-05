@@ -206,6 +206,7 @@ void* web(void*data) {
 static void del_sig(int sig){
     puts("\n");
     printf("Total requests:\t%u\n", total);
+    printf("Total write log:\t%u\n", tol_log);
     printf("read socket:\t%4.2fms/time\n", read_soc / total);
     printf("read web:\t%4.2fms/time\n", read_web / total);
     printf("post data:\t%4.2fms/time\n", post_dt / total);

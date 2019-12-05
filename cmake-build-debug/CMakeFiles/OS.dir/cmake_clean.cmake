@@ -1,6 +1,4 @@
 file(REMOVE_RECURSE
-  "CMakeFiles/OS.dir/experiment/webserver/exp2/webserver.c.o"
-  "CMakeFiles/OS.dir/experiment/webserver/exp3/webserver.c.o"
   "CMakeFiles/OS.dir/main.c.o"
   "OS"
   "OS.pdb"

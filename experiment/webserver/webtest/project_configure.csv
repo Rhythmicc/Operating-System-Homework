@@ -1,0 +1,6 @@
+compile_tool,,
+compile_filename,webtest.py
+executable_filename,python3 webtest.py
+input_file,dist/input.txt
+template_root,template/
+server_target,2017011344@10.3.29.173:webtest/

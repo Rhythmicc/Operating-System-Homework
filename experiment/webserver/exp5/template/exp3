@@ -12,6 +12,7 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <time.h>
+#include <pthread.h>
 
 #define VERSION 23
 #define BUFSIZE 8096
@@ -22,9 +23,9 @@
 #ifndef SIGCLD
 #define SIGCLD SIGCHLD
 #endif
-int fds[2];
-unsigned total = 0, tol_log = 0;
-double sum_time[4];
+#define RMALLOC(type,n) (type*)malloc(sizeof(type)*(n))
+#define MALLOC(p,type,n) type*p = RMALLOC(type, n)
+
 struct {
     char *ext;
     char *filetype;
@@ -41,6 +42,9 @@ struct {
         {"html", "text/html"},
         {0,      0}
 };
+double read_soc, post_dt, read_web, write_log;
+unsigned int total, tol_log = 0;
+pthread_mutex_t rs,wl;
 
 void time_to_str(char*res){
     time_t t;
@@ -51,9 +55,9 @@ void time_to_str(char*res){
 
 /* 日志函数，将运行过程中的提示信息记录到 webserver.log 文件中*/
 
-void logger(int type, char *s1, char *s2, int socket_fd, int*fp) {
+void logger(int type, char *s1, char *s2, int socket_fd) {
     struct timeval t1,t2;
-    gettimeofday(&t1, NULL);
+    gettimeofday(&t1,NULL);
     int fd;
     char logbuffer[BUFSIZE * 2];
     char TIME[105];
@@ -105,112 +109,115 @@ void logger(int type, char *s1, char *s2, int socket_fd, int*fp) {
         (void) close(fd);
     }
     gettimeofday(&t2,NULL);
-    char ret_val[105];
-    sprintf(ret_val, "%f -1 -1", (t2.tv_sec - t1.tv_sec) * 1000.0 + (t2.tv_usec - t1.tv_usec) / 1000.0);
-    write(fp[1], ret_val, 105);
+    pthread_mutex_lock(&wl);
+    ++tol_log;
+    write_log += (t2.tv_sec - t1.tv_sec) * 1000.0 + (t2.tv_usec - t1.tv_usec) / 1000.0;
+    pthread_mutex_unlock(&wl);
 }
 
 /* 此函数完成了 WebServer 主要功能，它首先解析客户端发送的消息，然后从中获取客户端请求的文
 件名，然后根据文件名从本地将此文件读入缓存，并生成相应的 HTTP 响应消息；最后通过服务器与客户
 端的 socket 通道向客户端返回 HTTP 响应消息*/
 
-void web(int fd, int hit, struct timeval*delay, int *fp) {
-    long ret;
+typedef struct {
+    int fd,hit;
+    struct timeval*delay;
+}webparam;
+
+void* web(void*data) {
+    webparam*p = (webparam*)data;
+    int fd = p->fd, hit = p->hit, file_fd, buflen;
+    struct timeval*delay = p->delay;
+    long i, j, len, ret;
     static char buffer[BUFSIZE + 1]; /* 设置静态缓冲区 */
     ret = read(fd, buffer, BUFSIZE);
-    if (fork() == 0) {
-        struct timeval t1, t2;
-        int file_fd, buflen;
-        char *fstr;
-        long i, j, len;
-        double deal, find, post;
-        gettimeofday(&t1, NULL);
-        /* 从连接通道中读取客户端的请求消息 */
-        if (ret == 0 || ret == -1) { //如果读取客户端消息失败，则向客户端发送 HTTP 失败响应信息
-            logger(FORBIDDEN, "failed to read browser request", "", fd, fp);
-        }
-        if (ret > 0 && ret < BUFSIZE)
-/* 设置有效字符串，即将字符串尾部表示为 0 */
-            buffer[ret] = 0;
-        else buffer[0] = 0;
-        for (i = 0; i < ret; i++) /* 移除消息字符串中的“CF”和“LF”字符*/
-            if (buffer[i] == '\r' || buffer[i] == '\n')
-                buffer[i] = '*';
-        logger(LOG, "request", buffer, hit, fp);
+    struct timeval t1, t2;
+    double deal, find;
+    char *fstr;
+    gettimeofday(&t1, NULL);
+    /* 从连接通道中读取客户端的请求消息 */
+    if (ret == 0 || ret == -1)  //如果读取客户端消息失败，则向客户端发送 HTTP 失败响应信息
+        logger(FORBIDDEN, "failed to read browser request", "", fd);
+    if (ret > 0 && ret < BUFSIZE) buffer[ret] = 0;
+    else buffer[0] = 0;
+    for (i = 0; i < ret; i++) /* 移除消息字符串中的“CF”和“LF”字符*/
+        if (buffer[i] == '\r' || buffer[i] == '\n')
+            buffer[i] = '*';
+    logger(LOG, "request", buffer, hit);
 /*判断客户端 HTTP 请求消息是否为 GET 类型，如果不是则给出相应的响应消息*/
-        if (strncmp(buffer, "GET ", 4) && strncmp(buffer, "get ", 4)) {
-            logger(FORBIDDEN, "Only simple GET operation supported", buffer, fd, fp);
-        }
-        for (i = 4; i < BUFSIZE; i++) { /* null terminate after the second space to ignore extra stuff */
-            if (buffer[i] == ' ') { /* string is "GET URL " +lots of other stuff */
-                buffer[i] = 0;
-                break;
-            }
-        }
-        gettimeofday(&t2, NULL);
-        deal = (t2.tv_sec - t1.tv_sec) * 1000.0 + (t2.tv_usec - t1.tv_usec) / 1000.0;
-        gettimeofday(&t1, NULL);
-        for (j = 0; j < i - 1; j++)
-/* 在消息中检测路径，不允许路径中出现“.” */
-            if (buffer[j] == '.' && buffer[j + 1] == '.') {
-                logger(FORBIDDEN, "Parent directory (..) path names not supported", buffer, fd, fp);
-            }
-        if (!strncmp(&buffer[0], "GET /\0", 6) || !strncmp(&buffer[0], "get /\0", 6))
-/* 如果请求消息中没有包含有效的文件名，则使用默认的文件名 index.html */
-            (void) strcpy(buffer, "GET /index.html");
-/* 根据预定义在 extensions 中的文件类型，检查请求的文件类型是否本服务器支持 */
-        buflen = strlen(buffer);
-        fstr = (char *) 0;
-        for (i = 0; extensions[i].ext != 0; i++) {
-            len = strlen(extensions[i].ext);
-            if (!strncmp(&buffer[buflen - len], extensions[i].ext, len)) {
-                fstr = extensions[i].filetype;
-                break;
-            }
-        }
-        if (fstr == 0) logger(FORBIDDEN, "file extension type not supported", buffer, fd, fp);
-        gettimeofday(&t2, NULL);
-        find = (t2.tv_sec - t1.tv_sec) * 1000.0 + (t2.tv_usec - t1.tv_usec) / 1000.0;
-        gettimeofday(&t1, NULL);
-        if ((file_fd = open(&buffer[5], O_RDONLY)) == -1) { /* 打开指定的文件名*/
-            logger(NOTFOUND, "failed to open file", &buffer[5], fd, fp);
-        }
-        logger(LOG, "SEND", &buffer[5], hit, fp);
-        len = (long) lseek(file_fd, (off_t) 0, SEEK_END); /* 通过 lseek 获取文件长度*/
-        (void) lseek(file_fd, (off_t) 0, SEEK_SET); /* 将文件指针移到文件首位置*/
-        (void) sprintf(buffer,
-                       "HTTP/1.1 200 OK\nServer:nweb/%d.0\nContent-Length:%ld\nConnection:close\nContent-Type: %s\n\n",
-                       VERSION, len, fstr); /* Header + a blank line */
-        logger(LOG, "Header", buffer, hit, fp);
-        (void) write(fd, buffer, strlen(buffer));
-/* 不停地从文件里读取文件内容，并通过 socket 通道向客户端返回文件内容*/
-        while ((ret = read(file_fd, buffer, BUFSIZE)) > 0) {
-            (void) write(fd, buffer, ret);
-        }
-        select(0, NULL, NULL, NULL, delay);
-        close(fd);
-        gettimeofday(&t2, NULL);
-        //printf("post message, with %.2fms\n", (t2.tv_sec - t1.tv_sec) * 1000.0 + (t2.tv_usec - t1.tv_usec) / 1000.0);
-        post = (t2.tv_sec - t1.tv_sec) * 1000.0 + (t2.tv_usec - t1.tv_usec) / 1000.0;
-        char ret_val[105];
-        sprintf(ret_val, "%f %f %f", deal, find, post);
-        write(fp[1], ret_val, 105);
-        exit(0);
+    if (strncmp(buffer, "GET ", 4) && strncmp(buffer, "get ", 4)) {
+        logger(FORBIDDEN, "Only simple GET operation supported", buffer, fd);
     }
+    for (i = 4; i < BUFSIZE; i++) { /* null terminate after the second space to ignore extra stuff */
+        if (buffer[i] == ' ') { /* string is "GET URL " +lots of other stuff */
+            buffer[i] = 0;
+            break;
+        }
+    }
+    gettimeofday(&t2, NULL);
+    deal = (t2.tv_sec - t1.tv_sec) * 1000.0 + (t2.tv_usec - t1.tv_usec) / 1000.0;
+    gettimeofday(&t1, NULL);
+    for (j = 0; j < i - 1; j++)
+/* 在消息中检测路径，不允许路径中出现“.” */
+        if (buffer[j] == '.' && buffer[j + 1] == '.')
+            logger(FORBIDDEN, "Parent directory (..) path names not supported", buffer, fd);
+    if (!strncmp(&buffer[0], "GET /\0", 6) || !strncmp(&buffer[0], "get /\0", 6))
+/* 如果请求消息中没有包含有效的文件名，则使用默认的文件名 index.html */
+        (void) strcpy(buffer, "GET /index.html");
+/* 根据预定义在 extensions 中的文件类型，检查请求的文件类型是否本服务器支持 */
+    buflen = strlen(buffer);
+    fstr = (char *) 0;
+    for (i = 0; extensions[i].ext != 0; i++) {
+        len = strlen(extensions[i].ext);
+        if (!strncmp(&buffer[buflen - len], extensions[i].ext, len)) {
+            fstr = extensions[i].filetype;
+            break;
+        }
+    }
+    if (fstr == 0){
+        logger(FORBIDDEN, "file extension type not supported", buffer, fd);
+    }
+    gettimeofday(&t2, NULL);
+    find = (t2.tv_sec - t1.tv_sec) * 1000.0 + (t2.tv_usec - t1.tv_usec) / 1000.0;
+    gettimeofday(&t1, NULL);
+    if ((file_fd = open(&buffer[5], O_RDONLY)) == -1) { /* 打开指定的文件名*/
+        logger(NOTFOUND, "failed to open file", &buffer[5], fd);
+    }
+    logger(LOG, "SEND", &buffer[5], hit);
+    len = (long) lseek(file_fd, (off_t) 0, SEEK_END); /* 通过 lseek 获取文件长度*/
+    (void) lseek(file_fd, (off_t) 0, SEEK_SET); /* 将文件指针移到文件首位置*/
+    (void) sprintf(buffer,
+                   "HTTP/1.1 200 OK\nServer:nweb/%d.0\nContent-Length:%ld\nConnection:close\nContent-Type: %s\n\n",
+                   VERSION, len, fstr); /* Header + a blank line */
+    logger(LOG, "Header", buffer, hit);
+    (void) write(fd, buffer, strlen(buffer));
+/* 不停地从文件里读取文件内容，并通过 socket 通道向客户端返回文件内容*/
+    while ((ret = read(file_fd, buffer, BUFSIZE)) > 0) {
+        (void) write(fd, buffer, ret);
+    }
+    select(0, NULL, NULL, NULL, delay);
+    close(fd);
+    gettimeofday(&t2, NULL);
+    pthread_mutex_lock(&rs);
+    read_soc += deal;
+    read_web += find;
+    post_dt += (t2.tv_sec - t1.tv_sec) * 1000.0 + (t2.tv_usec - t1.tv_usec) / 1000.0;
+    pthread_mutex_unlock(&rs);
+    free(p);
+    return NULL;
 }
 
 static void del_sig(int sig){
     puts("\n");
     printf("Total requests:\t%u\n", total);
-    printf("read socket:\t%4.2fms/time\n", sum_time[0] / total);
-    printf("read web:\t%4.2fms/time\n", sum_time[1] / total);
-    printf("post data:\t%4.2fms/time\n", sum_time[2] / total);
-    printf("write log:\t%4.2fms/time\n", sum_time[3] / tol_log);
+    printf("read socket:\t%4.2fms/time\n", read_soc / total);
+    printf("read web:\t%4.2fms/time\n", read_web / total);
+    printf("post data:\t%4.2fms/time\n", post_dt / total);
+    printf("write log:\t%4.2fms/time\n", write_log / tol_log);
     exit(0);
 }
 
 int main(int argc, char **argv) {
-    pipe(fds);
     int i, port, listenfd, socketfd, hit;
     socklen_t length;
     static struct sockaddr_in cli_addr; /* static = initialised to zeros */
@@ -244,48 +251,38 @@ int main(int argc, char **argv) {
     }
 /* 建立服务端侦听 socket*/
     if ((listenfd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
-        logger(ERROR, "system call", "socket", 0, fds);
+        logger(ERROR, "system call", "socket", 0);
     port = atoi(argv[1]);
     if (port < 0 || port > 60000)
-        logger(ERROR, "Invalid port number (try 1->60000)", argv[1], 0, fds);
+        logger(ERROR, "Invalid port number (try 1->60000)", argv[1], 0);
+    pthread_attr_t attr;
+    pthread_attr_init(&attr);
+    pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
+    pthread_t pth;
     serv_addr.sin_family = AF_INET;
     serv_addr.sin_addr.s_addr = htonl(INADDR_ANY);
     serv_addr.sin_port = htons(port);
     if (bind(listenfd, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0)
-        logger(ERROR, "system call", "bind", 0, fds);
+        logger(ERROR, "system call", "bind", 0);
     if (listen(listenfd, 64) < 0)
-        logger(ERROR, "system call", "listen", 0, fds);
+        logger(ERROR, "system call", "listen", 0);
+    signal(SIGINT, del_sig);
     struct timeval delay;
     delay.tv_sec = 0;
-    delay.tv_usec = 100;
-    if (fork() == 0) {
-        signal(SIGINT, del_sig);
-        memset(sum_time, 0, sizeof(sum_time));
-        char info[105];
-        double deal, find, post;
-        printf("listener pid: %d\n", getpid());
-        while (1) {
-            read(fds[0], info, 105);
-            sscanf(info, "%lf%lf%lf", &deal, &find, &post);
-            if(find < 0) {
-                sum_time[3] += deal;
-                ++tol_log;
-            }
-            else {
-                sum_time[0] += deal;
-                sum_time[1] += find;
-                sum_time[2] += post;
-                ++total;
-            }
+    delay.tv_usec = 100000;
+    pthread_mutex_init(&rs,NULL);
+    pthread_mutex_init(&wl,NULL);
+    for (hit = 1;; ++hit) {
+        length = sizeof(cli_addr);
+        if ((socketfd = accept(listenfd, (struct sockaddr *) &cli_addr, &length)) < 0) {
+            logger(ERROR, "system call", "accept", 0);
+            continue;
         }
-    } else {
-        for (hit = 1;; ++hit) {
-            length = sizeof(cli_addr);
-            if ((socketfd = accept(listenfd, (struct sockaddr *) &cli_addr, &length)) < 0) {
-                logger(ERROR, "system call", "accept", 0, fds);
-                continue;
-            }
-            web(socketfd, hit, &delay, fds);
-        }
+        ++total;
+        MALLOC(param, webparam, 1);
+        param->fd = socketfd;
+        param->hit = hit;
+        param->delay = &delay;
+        if(pthread_create(&pth, &attr, web, (void*)param)<0)logger(ERROR, "system call", "pthread_create", 0);
     }
 }
