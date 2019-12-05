@@ -285,7 +285,7 @@ int main(int argc, char **argv) {
         (void) printf("ERROR: Can't Change to directory %s\n", argv[2]);
         exit(4);
     }
-/* 建立服务端侦听 socket*/
+
     if ((listenfd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
         logger(ERROR, "system call", "socket", 0);
     port = atoi(argv[1]);
@@ -305,9 +305,9 @@ int main(int argc, char **argv) {
     signal(SIGINT, del_sig);
     pthread_mutex_init(&rs,NULL);
     pthread_mutex_init(&wl,NULL);
-    deal_pool = thpool_init(100);
-    data_pool = thpool_init(100);
-    post_pool = thpool_init(100);
+    deal_pool = thpool_init(50, "read_sock");
+    data_pool = thpool_init(50, "read_html");
+    post_pool = thpool_init(200, "post_data");
     for (hit = 1;; ++hit) {
         length = sizeof(cli_addr);
         if ((socketfd = accept(listenfd, (struct sockaddr *) &cli_addr, &length)) < 0) {

@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <pthread.h>
 #include <errno.h>
+#include <sys/time.h>
 #include <time.h>
 
 #if defined(__linux__)
@@ -59,14 +60,20 @@ typedef struct thread{
 /* Threadpool */
 typedef struct thpool_{
 	thread**   threads;                  /* pointer to threads        */
+#ifdef monitor
+	thread**   monitors;                 /* monitor of threads        */
+#endif
 	volatile int num_threads_alive;      /* threads currently alive   */
 	volatile int num_threads_working;    /* threads currently working */
 	pthread_mutex_t  thcount_lock;       /* used for thread count etc */
 	pthread_cond_t  threads_all_idle;    /* signal to thpool_wait     */
 	jobqueue  jobqueue;                  /* job queue                 */
-	int max_thread_work;
-	double sum_work_time;
-	double thread_sum_wait_time;
+	int num_threads;                     /* total num of threads      */
+#ifdef monitor
+	int time_fd[2];
+	int max_work, min_work, aver_work, tol;
+#endif
+	char*name;
 } thpool_;
 
 
@@ -93,61 +100,51 @@ static void  bsem_post(struct bsem *bsem_p);
 static void  bsem_post_all(struct bsem *bsem_p);
 static void  bsem_wait(struct bsem *bsem_p);
 
-
-
-
-
-/* ========================== THREADPOOL ============================ */
-
-
-/* Initialise thread pool */
-struct thpool_* thpool_init(int num_threads){
-
+struct thpool_* thpool_init(int num_threads, char*name){
 	threads_on_hold   = 0;
 	threads_keepalive = 1;
-
 	if (num_threads < 0){
 		num_threads = 0;
 	}
-
-	/* Make new thread pool */
 	thpool_* thpool_p;
 	thpool_p = (struct thpool_*)malloc(sizeof(struct thpool_));
 	if (thpool_p == NULL){
 		err("thpool_init(): Could not allocate memory for thread pool\n");
 		return NULL;
 	}
+	thpool_p->num_threads = num_threads;
+	thpool_p->name = name;
+#ifdef monitor
+	pipe(thpool_p->time_fd);
+	thpool_p->max_work = 0;
+	thpool_p->min_work = num_threads;
+#endif
 	thpool_p->num_threads_alive   = 0;
 	thpool_p->num_threads_working = 0;
-
-	/* Initialise the job queue */
 	if (jobqueue_init(&thpool_p->jobqueue) == -1){
 		err("thpool_init(): Could not allocate memory for job queue\n");
 		free(thpool_p);
 		return NULL;
 	}
-
-	/* Make threads in pool */
 	thpool_p->threads = (struct thread**)malloc(num_threads * sizeof(struct thread *));
+#ifdef monitor
+	thpool_p->monitors = (struct thread**)malloc(2 * sizeof(struct thread *));
+#endif
 	if (thpool_p->threads == NULL){
 		err("thpool_init(): Could not allocate memory for threads\n");
 		jobqueue_destroy(&thpool_p->jobqueue);
 		free(thpool_p);
 		return NULL;
 	}
-
 	pthread_mutex_init(&(thpool_p->thcount_lock), NULL);
 	pthread_cond_init(&thpool_p->threads_all_idle, NULL);
-
-	/* Thread init */
 	int n;
-	for (n=0; n<num_threads; n++){
-		thread_init(thpool_p, &thpool_p->threads[n], n);
-	}
-
-	/* Wait for threads to initialize */
+	for (n=0; n<num_threads; n++)thread_init(thpool_p, &thpool_p->threads[n], n);
+#ifdef monitor
+	thread_init(thpool_p, &thpool_p->monitors[0], num_threads);
+	thread_init(thpool_p, &thpool_p->monitors[1], num_threads + 1);
+#endif
 	while (thpool_p->num_threads_alive != num_threads) {}
-
 	return thpool_p;
 }
 
@@ -204,6 +201,14 @@ void thpool_destroy(thpool_* thpool_p){
 		tpassed = difftime(end,start);
 	}
 
+#ifdef monitor
+	/* terminate monitors */
+	usleep(500000);
+	printf("%s:\tmax work: %d\tmin work: %d\taver work: %d\n", thpool_p->name, thpool_p->max_work, thpool_p->min_work, thpool_p->aver_work/thpool_p->tol);
+	char buf[15];
+	sprintf(buf, "-1");
+	write(thpool_p->time_fd[1], buf, 15);
+#endif
 	/* Poll remaining threads */
 	while (thpool_p->num_threads_alive){
 		bsem_post_all(thpool_p->jobqueue.has_jobs);
@@ -217,6 +222,11 @@ void thpool_destroy(thpool_* thpool_p){
 	for (n=0; n < threads_total; n++){
 		thread_destroy(thpool_p->threads[n]);
 	}
+#ifdef monitor
+	thread_destroy(thpool_p->monitors[0]);
+	thread_destroy(thpool_p->monitors[1]);
+	free(thpool_p->monitors);
+#endif
 	free(thpool_p->threads);
 	free(thpool_p);
 }
@@ -236,7 +246,37 @@ void thpool_resume(thpool_* thpool_p) {
     (void)thpool_p;
 	threads_on_hold = 0;
 }
+#ifdef monitor
+void*thpool_time_monitor(void*param){
+    thpool_*pool = (thpool_*)param;
+    char tv[15];
+    double t, sum=0;
+    unsigned tol = 0;
+    while(threads_keepalive){
+        read(pool->time_fd[0], tv, 15);
+        sscanf(tv, "%lf", &t);
+        if(t<0)break;
+        ++tol;
+        sum += t;
+    }
+    printf("%s\taver time:\t%.3lf\n", pool->name ,sum / tol);
+    return NULL;
+}
 
+void*thpool_monitor(void*param){
+    thpool_*pool = (thpool_*)param;
+
+    while(threads_keepalive) {
+        usleep(500000);
+        int wnum = pool->num_threads_working;
+        pool->aver_work += wnum;
+        ++pool->tol;
+        pool->min_work = pool->min_work > wnum ? wnum : pool->min_work;
+        pool->max_work = pool->max_work < wnum ? wnum : pool->max_work;
+    }
+    return NULL;
+}
+#endif
 
 int thpool_num_threads_working(thpool_* thpool_p){
 	return thpool_p->num_threads_working;
@@ -253,7 +293,11 @@ static int thread_init (thpool_* thpool_p, struct thread** thread_p, int id){
 	(*thread_p)->thpool_p = thpool_p;
 	(*thread_p)->id       = id;
 
-	pthread_create(&(*thread_p)->pthread, NULL, (void *)thread_do, (*thread_p));
+	if(id < thpool_p->num_threads)pthread_create(&(*thread_p)->pthread, NULL, (void *)thread_do, (*thread_p));
+#ifdef monitor
+	else if(id==thpool_p->num_threads)pthread_create(&(*thread_p)->pthread, NULL, thpool_monitor, (void*)thpool_p);
+	else pthread_create(&(*thread_p)->pthread, NULL, thpool_time_monitor, (void*)thpool_p);
+#endif
 	pthread_detach((*thread_p)->pthread);
 	return 0;
 }
@@ -282,6 +326,10 @@ static void* thread_do(struct thread* thread_p){
 
 	/* Register signal handler */
 	struct sigaction act;
+#ifdef monitor
+	struct timeval t1, t2;
+	char buf[15];
+#endif
 	sigemptyset(&act.sa_mask);
 	act.sa_flags = 0;
 	act.sa_handler = thread_hold;
@@ -303,7 +351,9 @@ static void* thread_do(struct thread* thread_p){
 			pthread_mutex_lock(&thpool_p->thcount_lock);
 			thpool_p->num_threads_working++;
 			pthread_mutex_unlock(&thpool_p->thcount_lock);
-
+#ifdef monitor
+			gettimeofday(&t1, NULL);
+#endif
 			/// Read job from queue and execute it
 			void (*func_buff)(void*);
 			void*  arg_buff;
@@ -314,7 +364,11 @@ static void* thread_do(struct thread* thread_p){
 				func_buff(arg_buff);
 				free(job_p);
 			}
-
+#ifdef monitor
+			gettimeofday(&t2, NULL);
+			sprintf(buf, "%f", (t2.tv_sec - t1.tv_sec) * 1000.0 + (t2.tv_usec - t1.tv_usec) / 1000.0);
+			write(thpool_p->time_fd[1], buf, 15);
+#endif
 			pthread_mutex_lock(&thpool_p->thcount_lock);
 			thpool_p->num_threads_working--;
 			if (!thpool_p->num_threads_working) {

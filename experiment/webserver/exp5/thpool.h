@@ -9,7 +9,7 @@ extern "C" {
 
 
 typedef struct thpool_* threadpool;
-threadpool thpool_init(int num_threads);
+threadpool thpool_init(int num_threads, char*name);
 int thpool_add_work(threadpool, void (*function_p)(void*), void* arg_p);
 void thpool_wait(threadpool);
 void thpool_pause(threadpool);
