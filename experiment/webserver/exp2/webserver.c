@@ -46,7 +46,7 @@ void time_to_str(char*res){
     time_t t;
     time (&t);
     struct tm *lt = localtime(&t);
-    sprintf(res, "%4d-%02d-%02d %02d:%02d:%02d\n",lt->tm_year+1900, lt->tm_mon, lt->tm_mday, lt->tm_hour, lt->tm_min, lt->tm_sec);
+    sprintf(res, "%4d-%02d-%02d %02d:%02d:%02d\n",lt->tm_year+1900, lt->tm_mon+1, lt->tm_mday, lt->tm_hour, lt->tm_min, lt->tm_sec);
 }
 
 /* 日志函数，将运行过程中的提示信息记录到 webserver.log 文件中*/
@@ -116,7 +116,7 @@ void logger(int type, char *s1, char *s2, int socket_fd, int*fp) {
 
 void web(int fd, int hit, int *fp) {
     long ret;
-    static char buffer[BUFSIZE + 1]; /* 设置静态缓冲区 */
+    char buffer[BUFSIZE + 1]; /* 设置静态缓冲区 */
     ret = read(fd, buffer, BUFSIZE);
     if (fork() == 0) {
         struct timeval t1, t2;

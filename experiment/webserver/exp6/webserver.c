@@ -12,6 +12,7 @@
 #include <arpa/inet.h>
 #include <time.h>
 #include <pthread.h>
+#include "thpool.h"
 
 #define VERSION 23
 #define BUFSIZE 8096
@@ -43,20 +44,23 @@ struct {
 };
 double read_soc, post_dt, read_web, write_log;
 unsigned int total, tol_log = 0;
-pthread_mutex_t rs,wl;
+pthread_mutex_t rs, wl;
+pthread_t monitor_id;
+int job_fd[2], monitor_fd[2], mds = 4;
 
-void time_to_str(char*res){
+void time_to_str(char *res) {
     time_t t;
-    time (&t);
+    time(&t);
     struct tm *lt = localtime(&t);
-    sprintf(res, "%4d-%02d-%02d %02d:%02d:%02d\n",lt->tm_year+1900, lt->tm_mon+1, lt->tm_mday, lt->tm_hour, lt->tm_min, lt->tm_sec);
+    sprintf(res, "%4d-%02d-%02d %02d:%02d:%02d\n", lt->tm_year + 1900, lt->tm_mon+1, lt->tm_mday, lt->tm_hour, lt->tm_min,
+            lt->tm_sec);
 }
 
 /* 日志函数，将运行过程中的提示信息记录到 webserver.log 文件中*/
 
 void logger(int type, char *s1, char *s2, int socket_fd) {
-    struct timeval t1,t2;
-    gettimeofday(&t1,NULL);
+    struct timeval t1, t2;
+    gettimeofday(&t1, NULL);
     int fd;
     char logbuffer[BUFSIZE * 2];
     char TIME[105];
@@ -107,7 +111,7 @@ void logger(int type, char *s1, char *s2, int socket_fd) {
         (void) write(fd, "\n", 1);
         (void) close(fd);
     }
-    gettimeofday(&t2,NULL);
+    gettimeofday(&t2, NULL);
     pthread_mutex_lock(&wl);
     ++tol_log;
     write_log += (t2.tv_sec - t1.tv_sec) * 1000.0 + (t2.tv_usec - t1.tv_usec) / 1000.0;
@@ -122,7 +126,7 @@ typedef struct {
     int fd,hit;
 }webparam;
 
-void* web(void*data) {
+void web(void*data) {
     webparam *p = (webparam *) data;
     int fd = p->fd, hit = p->hit, file_fd, buflen;
     long i, j, len, ret;
@@ -200,10 +204,12 @@ void* web(void*data) {
     post_dt += (t2.tv_sec - t1.tv_sec) * 1000.0 + (t2.tv_usec - t1.tv_usec) / 1000.0;
     pthread_mutex_unlock(&rs);
     free(p);
-    return NULL;
 }
 
-static void del_sig(int sig){
+static void del_sig(int sig) {
+    char info[35];
+    sprintf(info, "-1 -1");
+    write(job_fd[1], info, 35);
     puts("\n");
     printf("Total requests:\t%u\n", total);
     printf("Total write log:\t%u\n", tol_log);
@@ -212,6 +218,24 @@ static void del_sig(int sig){
     printf("post data:\t%4.2fms/time\n", post_dt / total);
     printf("write log:\t%4.2fms/time\n", write_log / tol_log);
     exit(0);
+}
+
+void job_listener() {
+    if (fork() == 0) {
+        char info[35];
+        int fd, hit;
+        while (1) {
+            read(job_fd[0], info, 35);
+            sscanf(info, "%d%d", &fd, &hit);
+            if (fd < 0)break;
+            MALLOC(p, webparam, 1);
+            p->fd = fd;
+            p->hit = hit;
+            pthread_t pid;
+            pthread_create(&pid, NULL, (void *) web, (void *) p);
+        }
+        exit(0);
+    }
 }
 
 int main(int argc, char **argv) {
@@ -255,17 +279,19 @@ int main(int argc, char **argv) {
     pthread_attr_t attr;
     pthread_attr_init(&attr);
     pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
-    pthread_t pth;
     serv_addr.sin_family = AF_INET;
     serv_addr.sin_addr.s_addr = htonl(INADDR_ANY);
     serv_addr.sin_port = htons(port);
     if (bind(listenfd, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0)
         logger(ERROR, "system call", "bind", 0);
-    if (listen(listenfd, 64) < 0)
-        logger(ERROR, "system call", "listen", 0);
+    if (listen(listenfd, 64) < 0)logger(ERROR, "system call", "listen", 0);
+    pthread_mutex_init(&rs, NULL);
+    pthread_mutex_init(&wl, NULL);
+    pipe(job_fd);
+    pipe(monitor_fd);
+    job_listener();
     signal(SIGINT, del_sig);
-    pthread_mutex_init(&rs,NULL);
-    pthread_mutex_init(&wl,NULL);
+    char info[35];
     for (hit = 1;; ++hit) {
         length = sizeof(cli_addr);
         if ((socketfd = accept(listenfd, (struct sockaddr *) &cli_addr, &length)) < 0) {
@@ -273,9 +299,7 @@ int main(int argc, char **argv) {
             continue;
         }
         ++total;
-        MALLOC(param, webparam, 1);
-        param->fd = socketfd;
-        param->hit = hit;
-        if(pthread_create(&pth, &attr, web, (void*)param)<0)logger(ERROR, "system call", "pthread_create", 0);
+        sprintf(info, "%d %d", socketfd, hit);
+        write(job_fd[1], info, 35);
     }
 }

@@ -51,7 +51,7 @@ void time_to_str(char*res){
     time_t t;
     time (&t);
     struct tm *lt = localtime(&t);
-    sprintf(res, "%4d-%02d-%02d %02d:%02d:%02d\n",lt->tm_year+1900, lt->tm_mon, lt->tm_mday, lt->tm_hour, lt->tm_min, lt->tm_sec);
+    sprintf(res, "%4d-%02d-%02d %02d:%02d:%02d\n",lt->tm_year+1900, lt->tm_mon+1, lt->tm_mday, lt->tm_hour, lt->tm_min, lt->tm_sec);
 }
 
 /* 日志函数，将运行过程中的提示信息记录到 webserver.log 文件中*/

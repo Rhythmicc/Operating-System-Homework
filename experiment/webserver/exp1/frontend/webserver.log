@@ -1,8 +1,68 @@
-2019-10-01 22:36:50
- INFO: request:GET / HTTP/1.1**Host: 10.120.96.237:8000**Upgrade-Insecure-Requests: 1**Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8**User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_1) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Safari/605.1.15**Accept-Language: zh-cn**Accept-Encoding: gzip, deflate**Connection: keep-alive****:1
-2019-10-01 22:36:50
+2019-11-07 01:34:49
+FORBIDDEN: failed to read browser request:
+2019-11-07 01:34:49
+ INFO: request::1
+2019-11-07 01:34:49
+FORBIDDEN: Only simple GET operation supported:
+2019-11-07 01:34:49
+FORBIDDEN: file extension type not supported:
+2019-11-07 01:34:49
+NOT FOUND: failed to open file:
+2019-11-07 01:34:49
+ INFO: SEND::1
+2019-11-07 01:34:49
+ INFO: Header:HTTP/1.1 200 OK
+Server:nweb/23.0
+Content-Length:-1
+Connection:close
+Content-Type: (null)
+
+:1
+2019-12-07 11:24:54
+FORBIDDEN: failed to read browser request:
+2019-12-07 11:24:54
+ INFO: request::1
+2019-12-07 11:24:54
+FORBIDDEN: Only simple GET operation supported:
+2019-12-07 11:24:54
+FORBIDDEN: file extension type not supported:
+2019-12-07 11:24:54
+NOT FOUND: failed to open file:
+2019-12-07 11:24:54
+ INFO: SEND::1
+2019-12-07 11:24:54
+ INFO: Header:HTTP/1.1 200 OK
+Server:nweb/23.0
+Content-Length:-1
+Connection:close
+Content-Type: (null)
+
+:1
+2019-12-07 11:28:26
+FORBIDDEN: failed to read browser request:
+2019-12-07 11:28:26
+ INFO: request::1
+2019-12-07 11:28:26
+FORBIDDEN: Only simple GET operation supported:
+2019-12-07 11:28:26
+FORBIDDEN: file extension type not supported:
+2019-12-07 11:28:26
+NOT FOUND: failed to open file:ªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªò
+2019-12-07 11:28:26
+ INFO: SEND:ªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªªò:1
+2019-12-07 11:28:26
+ INFO: Header:HTTP/1.1 200 OK
+Server:nweb/23.0
+Content-Length:-1
+Connection:close
+Content-Type: (null)
+
+:1
+2019-12-07 11:48:16
+ INFO: request:GET / HTTP/1.1**Host: 10.10.34.11:9168**Upgrade-Insecure-Requests: 1**Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8**User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_1) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Safari/605.1.15**Accept-Language: zh-cn**Accept-Encoding: gzip, deflate**Connection: keep-alive****:1
+2019-12-07 11:48:16
  INFO: SEND:index.html:1
-2019-10-01 22:36:50
+2019-12-07 11:48:16
  INFO: Header:HTTP/1.1 200 OK
 Server:nweb/23.0
 Content-Length:261
@@ -10,11 +70,11 @@ Connection:close
 Content-Type: text/html
 
 :1
-2019-10-01 22:36:51
- INFO: request:GET /1.png HTTP/1.1**Host: 10.120.96.237:8000**Connection: keep-alive**Accept: image/png,image/svg+xml,image/*;q=0.8,video/*;q=0.8,*/*;q=0.5**User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_1) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Safari/605.1.15**Accept-Language: zh-cn**Referer: http://10.120.96.237:8000/**Accept-Encoding: gzip, deflate****:2
-2019-10-01 22:36:51
+2019-12-07 11:48:16
+ INFO: request:GET /1.png HTTP/1.1**Host: 10.10.34.11:9168**Connection: keep-alive**Accept: image/png,image/svg+xml,image/*;q=0.8,video/*;q=0.8,*/*;q=0.5**User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_1) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Safari/605.1.15**Accept-Language: zh-cn**Referer: http://10.10.34.11:9168/**Accept-Encoding: gzip, deflate****:2
+2019-12-07 11:48:16
  INFO: SEND:1.png:2
-2019-10-01 22:36:51
+2019-12-07 11:48:16
  INFO: Header:HTTP/1.1 200 OK
 Server:nweb/23.0
 Content-Length:710258
@@ -22,51 +82,45 @@ Connection:close
 Content-Type: image/png
 
 :2
-2019-10-01 22:36:56
- INFO: request:GET / HTTP/1.1**Host: 10.120.96.237:8000**Upgrade-Insecure-Requests: 1**Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8**User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_1) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Safari/605.1.15**Accept-Language: zh-cn**Accept-Encoding: gzip, deflate**Connection: keep-alive****:3
-2019-10-01 22:36:56
- INFO: SEND:index.html:3
-2019-10-01 22:36:56
+2019-12-07 11:48:16
+ INFO: request:GET /apple-touch-icon-precomposed.png HTTP/1.1**Host: 10.10.34.11:9168**Accept: */***Accept-Language: zh-cn**Connection: keep-alive**Accept-Encoding: gzip, deflate**User-Agent: Safari%E6%B5%8F%E8%A7%88%E5%99%A8/15608.3.10.1.4 CFNetwork/1120 Darwin/19.0.0 (x86_64)****:3
+2019-12-07 11:48:16
+NOT FOUND: failed to open file:apple-touch-icon-precomposed.png
+2019-12-07 11:48:16
+ INFO: SEND:apple-touch-icon-precomposed.png:3
+2019-12-07 11:48:16
  INFO: Header:HTTP/1.1 200 OK
 Server:nweb/23.0
-Content-Length:261
+Content-Length:-1
 Connection:close
-Content-Type: text/html
+Content-Type: image/png
 
 :3
-2019-10-01 22:36:57
- INFO: request:GET /1.png HTTP/1.1**Host: 10.120.96.237:8000**Connection: keep-alive**Accept: image/png,image/svg+xml,image/*;q=0.8,video/*;q=0.8,*/*;q=0.5**User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_1) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Safari/605.1.15**Accept-Language: zh-cn**Referer: http://10.120.96.237:8000/**Accept-Encoding: gzip, deflate****:4
-2019-10-01 22:36:57
- INFO: SEND:1.png:4
-2019-10-01 22:36:57
+2019-12-07 11:48:16
+ INFO: request:GET /apple-touch-icon.png HTTP/1.1**Host: 10.10.34.11:9168**Accept: */***Accept-Language: zh-cn**Connection: keep-alive**Accept-Encoding: gzip, deflate**User-Agent: Safari%E6%B5%8F%E8%A7%88%E5%99%A8/15608.3.10.1.4 CFNetwork/1120 Darwin/19.0.0 (x86_64)****:4
+2019-12-07 11:48:16
+NOT FOUND: failed to open file:apple-touch-icon.png
+2019-12-07 11:48:16
+ INFO: SEND:apple-touch-icon.png:4
+2019-12-07 11:48:16
  INFO: Header:HTTP/1.1 200 OK
 Server:nweb/23.0
-Content-Length:710258
+Content-Length:-1
 Connection:close
 Content-Type: image/png
 
 :4
-2019-10-01 22:36:58
- INFO: request:GET / HTTP/1.1**Host: 10.120.96.237:8000**Upgrade-Insecure-Requests: 1**Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8**User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_1) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Safari/605.1.15**Accept-Language: zh-cn**Accept-Encoding: gzip, deflate**Connection: keep-alive****:5
-2019-10-01 22:36:58
- INFO: SEND:index.html:5
-2019-10-01 22:36:58
+2019-12-07 11:48:16
+ INFO: request:GET /favicon.ico HTTP/1.1**Host: 10.10.34.11:9168**Connection: keep-alive**Accept: */***User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_1) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Safari/605.1.15**Accept-Language: zh-cn**Referer: http://10.10.34.11:9168/**Accept-Encoding: gzip, deflate****:5
+2019-12-07 11:48:16
+NOT FOUND: failed to open file:favicon.ico
+2019-12-07 11:48:16
+ INFO: SEND:favicon.ico:5
+2019-12-07 11:48:16
  INFO: Header:HTTP/1.1 200 OK
 Server:nweb/23.0
-Content-Length:261
+Content-Length:-1
 Connection:close
-Content-Type: text/html
+Content-Type: image/ico
 
 :5
-2019-10-01 22:36:59
- INFO: request:GET /1.png HTTP/1.1**Host: 10.120.96.237:8000**Connection: keep-alive**Accept: image/png,image/svg+xml,image/*;q=0.8,video/*;q=0.8,*/*;q=0.5**User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_1) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Safari/605.1.15**Accept-Language: zh-cn**Referer: http://10.120.96.237:8000/**Accept-Encoding: gzip, deflate****:6
-2019-10-01 22:36:59
- INFO: SEND:1.png:6
-2019-10-01 22:36:59
- INFO: Header:HTTP/1.1 200 OK
-Server:nweb/23.0
-Content-Length:710258
-Connection:close
-Content-Type: image/png
-
-:6

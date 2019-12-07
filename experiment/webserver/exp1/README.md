@@ -258,16 +258,16 @@ clean:
    import requests
    
    def get_file(url, file):
-     url += file
-   	content = requests.get(url).content
-   	with open(file, 'wb') as f:
-   		f.write(content)
+       url += file
+       content = requests.get(url).content
+       with open(file, 'wb') as f:
+           f.write(content)
    
    
    if __name__ == '__main__':
-   	file_name = "source.tar.gz" # 替换为文件名
-   	url = 'http://10.200.33.64:8000/' # 将IP地址拷贝过来
-   	get_file(url, file_name)
+       file_name = "source.tar.gz" # 替换为文件名
+       url = 'http://10.200.33.64:8000/' # 将IP地址拷贝过来
+       get_file(url, file_name)
 
    ```
 
@@ -547,7 +547,7 @@ NONE
 
    1. vmstat输出结果:
 
-   ```txt
+   ```tex
    procs -----------memory---------- ---swap-- -----io---- --system-- -----cpu-----
     r  b   swpd   free   buff  cache   si   so    bi    bo   in   cs us sy id wa st
     1  0      0 11986664 470352 2473696    0    0     0     1    1    3  0  0 100  0  0	
@@ -672,7 +672,7 @@ NONE
 
    2. Iostat
 
-   ```txt
+   ```text
    Linux 2.6.32-220.el6.x86_64 (cupcs_ha2) 	2019年11月04日 	_x86_64_	(8 CPU)
    
    avg-cpu:  %user   %nice %system %iowait  %steal   %idle
