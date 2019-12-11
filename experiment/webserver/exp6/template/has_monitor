@@ -5,9 +5,9 @@
 #include <string.h>
 #include <fcntl.h>
 #include <signal.h>
-#include <sys/types.h>
 #include <sys/time.h>
 #include <sys/socket.h>
+#include <sys/wait.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <time.h>
@@ -26,6 +26,12 @@
 #define RMALLOC(type,n) (type*)malloc(sizeof(type)*(n))
 #define MALLOC(p,type,n) type*p = RMALLOC(type, n)
 
+double read_soc, post_dt, read_web, write_log;
+unsigned int total, tol_log = 0;
+pthread_mutex_t rs, wl;
+pthread_t monitor_id;
+int hit_fd[2], monitor_fd[2], job_fd[2];
+
 struct {
     char *ext;
     char *filetype;
@@ -42,11 +48,64 @@ struct {
         {"html", "text/html"},
         {0,      0}
 };
-double read_soc, post_dt, read_web, write_log;
-unsigned int total, tol_log = 0;
-pthread_mutex_t rs, wl;
-pthread_t monitor_id;
-int job_fd[2], monitor_fd[2], mds = 4;
+
+void send_fd(int fds,int fd) {
+    struct msghdr msg;
+    memset(&msg, 0, sizeof(msg));
+    struct iovec iov[2];
+    char buf1[10] = "hello";
+    char buf2[10] = "world";
+    iov[0].iov_base = buf1;
+    iov[0].iov_len = 5;
+    iov[1].iov_base = buf2;
+    iov[1].iov_len = 5;
+    msg.msg_iov = iov;
+    msg.msg_iovlen = 2;
+    struct cmsghdr *cmsg;
+    int len = CMSG_LEN(sizeof(int));
+    cmsg = (struct cmsghdr *) calloc(1, len);
+    cmsg->cmsg_len = len;
+    cmsg->cmsg_level = SOL_SOCKET;
+    cmsg->cmsg_type = SCM_RIGHTS;
+    *(int *) CMSG_DATA(cmsg) = fd;
+    msg.msg_control = cmsg;
+    msg.msg_controllen = len;
+    int ret = sendmsg(fds, &msg, 0);
+    if (-1 == ret) {
+        perror("sendmsg");
+        return;
+    }
+    free(cmsg);   //释放资源
+}
+
+void recv_fd(int fds,int* pfd) {
+    struct msghdr msg;
+    memset(&msg, 0, sizeof(msg));
+    struct iovec iov[2];
+    char buf1[10] = {0};
+    char buf2[10] = {0};
+    iov[0].iov_base = buf1;
+    iov[0].iov_len = 5;
+    iov[1].iov_base = buf2;
+    iov[1].iov_len = 5;
+    msg.msg_iov = iov;
+    msg.msg_iovlen = 2;
+    struct cmsghdr *cmsg;
+    int len = CMSG_LEN(sizeof(int));
+    cmsg = (struct cmsghdr *) calloc(1, len);
+    cmsg->cmsg_len = len;
+    cmsg->cmsg_level = SOL_SOCKET;
+    cmsg->cmsg_type = SCM_RIGHTS;
+    msg.msg_control = cmsg;
+    msg.msg_controllen = len;
+    int ret = recvmsg(fds, &msg, 0);   //阻塞函数
+    if (-1 == ret) {
+        perror("recvmsg");
+        return;
+    }
+    *pfd = *(int *) CMSG_DATA(cmsg);
+    free(cmsg);   //释放资源
+}
 
 void time_to_str(char *res) {
     time_t t;
@@ -57,7 +116,6 @@ void time_to_str(char *res) {
 }
 
 /* 日志函数，将运行过程中的提示信息记录到 webserver.log 文件中*/
-
 void logger(int type, char *s1, char *s2, int socket_fd) {
     struct timeval t1, t2;
     gettimeofday(&t1, NULL);
@@ -207,12 +265,6 @@ void web(void*data) {
 }
 
 static void del_sig(int sig) {
-    char info[35];
-    sprintf(info, "-1 -1");
-    for (sig = 0; sig < mds; ++sig)write(job_fd[1], info, 35);
-    pthread_kill(monitor_id, 0);
-    usleep(500 * 1e3);
-
     puts("\n");
     printf("Total requests:\t%u\n", total);
     printf("Total write log:\t%u\n", tol_log);
@@ -223,45 +275,37 @@ static void del_sig(int sig) {
     exit(0);
 }
 
-void *monitor_thread(void*param) {
-    threadpool p= (threadpool)param;
-    char*name = thpool_name(p), info[35];
+void*monitor_thread(void*param){
+    threadpool pool = (threadpool)param;
+    char*name = thpool_name(pool);
+    char info[35];
     while(1){
         sleep(1);
-        int num = thpool_num_threads_working(p);
+        int num = thpool_num_threads_working(pool);
         sprintf(info, "%s: %d", name, num);
         write(monitor_fd[1], info, 35);
     }
+    return NULL;
 }
 
-void thpool_model(char*name) {
-    if (fork() == 0) {
-        threadpool pool = thpool_init(30, name);
-        pthread_t pid;
-        pthread_create(&pid, NULL, monitor_thread, (void*)pool);
-        char info[35];
-        int fd, hit;
+void process_model(int job, char*name) {
+    if (!fork()) {
+        int hit, fd;
+        pthread_t monitor;
+        threadpool pool = thpool_init(100, name);
+        pthread_create(&monitor, NULL, monitor_thread, (void*)pool);
         while (1) {
-            read(job_fd[0], info, 35);
-            sscanf(info, "%d%d", &fd, &hit);
-            if (fd < 0)break;
-            MALLOC(param, webparam, 1);
-            param->fd = fd;
-            param->hit = hit;
-            //thpool_add_work(pool, web, (void *) param);
-            web(param);
+            read(hit_fd[0], &hit, sizeof(int));
+            if (hit < 0)break;
+            recv_fd(job, &fd);
+            MALLOC(p, webparam, 1);
+            p->hit = hit;
+            p->fd = fd;
+            thpool_add_work(pool, web, p);
         }
-        pthread_kill(pid, 0);
-        //thpool_destroy(pool);
+        pthread_kill(monitor, 0);
+        thpool_destroy(pool);
         exit(0);
-    }
-}
-
-void*start_monitor(void*param) {
-    char info[35];
-    while(1) {
-        read(monitor_fd[0], info, 35);
-        puts(info);
     }
 }
 
@@ -314,14 +358,12 @@ int main(int argc, char **argv) {
     if (listen(listenfd, 64) < 0)logger(ERROR, "system call", "listen", 0);
     pthread_mutex_init(&rs, NULL);
     pthread_mutex_init(&wl, NULL);
-
-    pipe(job_fd);
+    socketpair(AF_LOCAL, SOCK_STREAM, 0, job_fd);
+    pipe(hit_fd);
     pipe(monitor_fd);
-    char*names[]={"process 1", "process 2", "process 3", "process 4"};
-    for (i = 0; i < mds; ++i)thpool_model(names[i]);
-    pthread_create(&monitor_id, NULL, start_monitor, NULL);
+
+    process_model(job_fd[0], "[1] thread-pool");
     signal(SIGINT, del_sig);
-    char info[35];
     for (hit = 1;; ++hit) {
         length = sizeof(cli_addr);
         if ((socketfd = accept(listenfd, (struct sockaddr *) &cli_addr, &length)) < 0) {
@@ -329,7 +371,7 @@ int main(int argc, char **argv) {
             continue;
         }
         ++total;
-        sprintf(info, "%d %d", socketfd, hit);
-        write(job_fd[1], info, 35);
+        send_fd(job_fd[1], socketfd);
+        write(hit_fd[1], (void *) &hit, sizeof(int));
     }
 }

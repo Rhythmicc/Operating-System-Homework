@@ -116,7 +116,7 @@ void logger(int type, char *s1, char *s2, int socket_fd) {
     pthread_mutex_unlock(&wl);
 }
 
-void read_data(void*param);
+void check_data(void*param);
 void post_data(void*param);
 
 typedef struct {
@@ -170,11 +170,11 @@ void deal(void*data) {
     rdt->fd = fd;
     rdt->lim = i;
     rdt->hit = hit;
-    thpool_add_work(data_pool, read_data, (void*)rdt);
+    thpool_add_work(data_pool, check_data, (void *) rdt);
     free(p);
 }
 
-void read_data(void*param){
+void check_data(void*param){
     read_param*p = (read_param*)param;
     struct timeval t1, t2;
     int i, j;

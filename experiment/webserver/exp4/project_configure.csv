@@ -3,4 +3,4 @@ compile_filename,webserver.c
 executable_filename,dist/exp4
 input_file,dist/input.txt
 template_root,template/
-server_target,2017011344@2001:da8:258:6304:92b1:1cff:fe09:d174:webserver/
+server_target,2017011344@202.204.194.17:webserver/
