@@ -51,7 +51,7 @@ struct hash_set {
     hashpair table[HASHTABELSIZE], *first_table;      /// hash table
     set_ret (*f)(set_t, const char *);                /// function pointer
     pthread_mutex_t mutex;
-    unsigned int capacity, _cur, first_cur, page_fault;
+    unsigned int capacity, _cur, first_cur;
 };/// *set_t
 
 set_t new_set(unsigned capacity, set_ret(*f)(set_t, const char *)) {
@@ -59,7 +59,7 @@ set_t new_set(unsigned capacity, set_ret(*f)(set_t, const char *)) {
         MALLOC(ret, hash_set, 1);
         pthread_mutex_init(&ret->mutex, NULL);
         ret->capacity = capacity;
-        ret->page_fault = ret->first_cur = ret->_cur = 0;
+        ret->first_cur = ret->_cur = 0;
         memset(ret->table, 0, sizeof(hashpair) * HASHTABELSIZE);
         if (f == ARC)ret->first_table = RMALLOC(hashpair, HASHTABELSIZE);
         else if(f == MQ)ret->first_table = RMALLOC(hashpair, HASHTABELSIZE * 3);
@@ -75,10 +75,6 @@ set_ret read_set(set_t set, const char *filename) {
     set_ret res = set->f(set, filename);
     pthread_mutex_unlock(&set->mutex);
     return res;
-}
-
-unsigned set_page_fault(set_t set){
-    return set->page_fault;
 }
 
 void del_set(set_t set) {
@@ -254,7 +250,6 @@ set_ret LRU(set_t set, const char *request) {
         src->cnt++;
         gettimeofday(&src->pre_t, NULL);
     } else { /// pre node
-        ++set->page_fault;
         if (set->_cur == set->capacity) { /// choose and replace
             src = LRU_CHOOSE(set->table);
             replace_after_src(src, request);
@@ -274,7 +269,6 @@ set_ret LFU(set_t set, const char *request) {
         src->cnt++;
         gettimeofday(&src->pre_t, NULL);
     } else {
-        ++set->page_fault;
         if (set->_cur == set->capacity) {
             src = LFU_CHOOSE(set->table);
             replace_after_src(src, request);
@@ -307,7 +301,6 @@ set_ret ARC(set_t set, const char *request) {
             }
             src = src->nxt;
         } else { /// not in first table
-            ++set->page_fault;
             if (set->first_cur == set->capacity) {
                 first_src = LRU_CHOOSE(first_table);
                 replace_after_src(first_src, request);
@@ -341,7 +334,6 @@ set_ret MQ(set_t set, const char *request) {
             }
             src = src->nxt;
         } else { /// not in first table
-            ++set->page_fault;
             if (set->first_cur == set->capacity) {
                 first_src = LRU_CHOOSE(first_table);
                 replace_after_src(first_src, request);
@@ -362,7 +354,6 @@ set_ret GD(set_t set, const char *request) {
         src->cnt++;
         gettimeofday(&src->pre_t, NULL);
     } else {
-        ++set->page_fault;
         if (set->_cur == set->capacity) {
             src = GD_CHOOSE(set->table);
             replace_after_src(src, request);
@@ -382,7 +373,6 @@ set_ret GDSF(set_t set, const char *request) {
         src->cnt++;
         gettimeofday(&src->pre_t, NULL);
     } else {
-        ++set->page_fault;
         if (set->_cur == set->capacity) {
             src = GDSF_CHOOSE(set->table);
             replace_after_src(src, request);

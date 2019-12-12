@@ -134,13 +134,14 @@ typedef struct {
 typedef struct {
     int fd,hit;
     char*buffer,*fstr;
+    set_ret dt;
 }post_param;
 
 void deal(void*data) {
     webparam *p = (webparam *) data;
     int fd = p->fd, hit = p->hit;
     long i, ret;
-    char buffer[BUFSIZE + 1];
+    MALLOC(buffer, char, BUFSIZE + 1);
     ret = read(fd, buffer, BUFSIZE);
     struct timeval t1, t2;
     gettimeofday(&t1, NULL);
@@ -196,12 +197,14 @@ void check_data(void*param){
         }
     }
     if (fstr == 0)logger(FORBIDDEN, "file extension type not supported", p->buffer, p->fd);
+    set_ret dt = read_set(cache, p->buffer + 5);
     gettimeofday(&t2, NULL);
     MALLOC(pdt, post_param,1);
     pdt->fd = p->fd;
     pdt->buffer = p->buffer;
     pdt->fstr = fstr;
     pdt->hit = p->hit;
+    pdt->dt = dt;
     thpool_add_work(post_pool, post_data, (void*)pdt);
     free(p);
     pthread_mutex_lock(&rs);
@@ -211,14 +214,14 @@ void check_data(void*param){
 
 void post_data(void*param) {
     post_param *p = (post_param *) param;
+    set_ret dt = p->dt;
     struct timeval t1, t2;
     gettimeofday(&t1, NULL);
-    hashpair*dt = read_set(cache, p->buffer + 5);
-    if (!dt->file_cache) { /* 打开指定的文件名*/
+    if (!dt.cache) {
         logger(NOTFOUND, "failed to open file", p->buffer + 5, p->fd);
     } else {
         logger(LOG, "SEND", p->buffer + 5, p->hit);
-        long len = dt->cost, cur_p = 0;
+        long len = dt.cost, cur_p = 0;
         sprintf(p->buffer,
                 "HTTP/1.1 200 OK\nServer:nweb/%d.0\nContent-Length:%ld\nConnection:close\nContent-Type: %s\n\n",
                 VERSION, len, p->fstr); /* Header + a blank line */
@@ -226,13 +229,14 @@ void post_data(void*param) {
         write(p->fd, p->buffer, strlen(p->buffer));
         while(cur_p < len) {
             long buflen = len - cur_p < BUFSIZE ? len - cur_p : BUFSIZE;
-            write(p->fd, dt->file_cache + cur_p, buflen);
+            write(p->fd, dt.cache + cur_p, buflen);
             cur_p += BUFSIZE;
         }
         usleep(1000);
-        close(p->fd);
     }
+    close(p->fd);
     gettimeofday(&t2, NULL);
+    free(p->buffer);
     free(p);
     pthread_mutex_lock(&rs);
     post_dt += (t2.tv_sec - t1.tv_sec) * 1000.0 + (t2.tv_usec - t1.tv_usec) / 1000.0;
@@ -246,6 +250,8 @@ static void del_sig(int sig){
     thpool_destroy(post_pool);
     puts("\n");
     printf("Total requests:\t%u\n", total);
+    printf("Total page fault:\t%u\n", set_page_fault(cache));
+    del_set(cache);
     printf("read socket:\t%4.2fms/time\n", read_soc / total);
     printf("read web:\t%4.2fms/time\n", read_web / total);
     printf("post data:\t%4.2fms/time\n", post_dt / total);
@@ -305,9 +311,9 @@ int main(int argc, char **argv) {
     pthread_mutex_init(&rs,NULL);
     pthread_mutex_init(&wl,NULL);
     deal_pool = thpool_init(50, "read_sock");
-    data_pool = thpool_init(50, "read_html");
+    data_pool = thpool_init(100, "read_html");
     post_pool = thpool_init(200, "post_data");
-    cache = new_set(200, 5, LRU);
+    cache = new_set(5000, ARC);
     for (hit = 1;; ++hit) {
         length = sizeof(cli_addr);
         if ((socketfd = accept(listenfd, (struct sockaddr *) &cli_addr, &length)) < 0) {

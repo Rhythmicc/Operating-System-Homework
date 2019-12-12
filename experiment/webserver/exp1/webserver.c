@@ -163,18 +163,19 @@ void web(int fd, int hit) {
         gettimeofday(&t1, NULL);
         if ((file_fd = open(&buffer[5], O_RDONLY)) == -1) { /* 打开指定的文件名*/
             logger(NOTFOUND, "failed to open file", &buffer[5], fd);
-        }
-        logger(LOG, "SEND", &buffer[5], hit);
-        len = (long) lseek(file_fd, (off_t) 0, SEEK_END); /* 通过 lseek 获取文件长度*/
-        (void) lseek(file_fd, (off_t) 0, SEEK_SET); /* 将文件指针移到文件首位置*/
-        (void) sprintf(buffer,
-                       "HTTP/1.1 200 OK\nServer:nweb/%d.0\nContent-Length:%ld\nConnection:close\nContent-Type: %s\n\n",
-                       VERSION, len, fstr); /* Header + a blank line */
-        logger(LOG, "Header", buffer, hit);
-        (void) write(fd, buffer, strlen(buffer));
+        } else {
+            logger(LOG, "SEND", &buffer[5], hit);
+            len = (long) lseek(file_fd, (off_t) 0, SEEK_END); /* 通过 lseek 获取文件长度*/
+            (void) lseek(file_fd, (off_t) 0, SEEK_SET); /* 将文件指针移到文件首位置*/
+            (void) sprintf(buffer,
+                           "HTTP/1.1 200 OK\nServer:nweb/%d.0\nContent-Length:%ld\nConnection:close\nContent-Type: %s\n\n",
+                           VERSION, len, fstr); /* Header + a blank line */
+            logger(LOG, "Header", buffer, hit);
+            (void) write(fd, buffer, strlen(buffer));
 /* 不停地从文件里读取文件内容，并通过 socket 通道向客户端返回文件内容*/
-        while ((ret = read(file_fd, buffer, BUFSIZE)) > 0) {
-            (void) write(fd, buffer, ret);
+            while ((ret = read(file_fd, buffer, BUFSIZE)) > 0) {
+                (void) write(fd, buffer, ret);
+            }
         }
         sleep(1); /* sleep 的作用是防止消息未发出，已经将此 socket 通道关闭*/
         close(fd);

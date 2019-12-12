@@ -13,7 +13,6 @@ typedef struct _ret {
 }set_ret;
 
 set_t new_set(unsigned capacity, set_ret(*f)(set_t, const char*));
-unsigned set_page_fault(set_t set);
 void del_set(set_t set);
 set_ret read_set(set_t set, const char*filename);
 set_ret LRU(set_t set, const char*request);

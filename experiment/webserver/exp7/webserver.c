@@ -13,6 +13,7 @@
 #include <time.h>
 #include <pthread.h>
 #include "thpool.h"
+#include "cache.h"
 
 #define VERSION 23
 #define BUFSIZE 8096
@@ -46,6 +47,7 @@ double read_soc, post_dt, read_web, write_log;
 unsigned int total, tol_log = 0;
 pthread_mutex_t rs,wl;
 threadpool deal_pool, data_pool, post_pool;
+set_t cache;
 
 void time_to_str(char*res){
     time_t t;
@@ -162,9 +164,6 @@ void deal(void*data) {
         }
     }
     gettimeofday(&t2, NULL);
-    pthread_mutex_lock(&rs);
-    read_soc += (t2.tv_sec - t1.tv_sec) * 1000.0 + (t2.tv_usec - t1.tv_usec) / 1000.0;
-    pthread_mutex_unlock(&rs);
     MALLOC(rdt, read_param, 1);
     rdt->buffer = buffer;
     rdt->fd = fd;
@@ -172,6 +171,9 @@ void deal(void*data) {
     rdt->hit = hit;
     thpool_add_work(data_pool, check_data, (void *) rdt);
     free(p);
+    pthread_mutex_lock(&rs);
+    read_soc += (t2.tv_sec - t1.tv_sec) * 1000.0 + (t2.tv_usec - t1.tv_usec) / 1000.0;
+    pthread_mutex_unlock(&rs);
 }
 
 void check_data(void*param){
@@ -180,13 +182,10 @@ void check_data(void*param){
     int i, j;
     gettimeofday(&t1, NULL);
     for (j = 0; j < p->lim - 1; j++)
-/* 在消息中检测路径，不允许路径中出现“.” */
         if (p->buffer[j] == '.' && p->buffer[j + 1] == '.')
             logger(FORBIDDEN, "Parent directory (..) path names not supported", p->buffer, p->fd);
     if (!strncmp(p->buffer, "GET /\0", 6) || !strncmp(p->buffer, "get /\0", 6))
-/* 如果请求消息中没有包含有效的文件名，则使用默认的文件名 index.html */
-        (void) strcpy(p->buffer, "GET /index.html");
-/* 根据预定义在 extensions 中的文件类型，检查请求的文件类型是否本服务器支持 */
+        strcpy(p->buffer, "GET /index.html");
     int buflen = strlen(p->buffer), len;
     char*fstr = (char *) 0;
     for (i = 0; extensions[i].ext != 0; i++) {
@@ -198,9 +197,6 @@ void check_data(void*param){
     }
     if (fstr == 0)logger(FORBIDDEN, "file extension type not supported", p->buffer, p->fd);
     gettimeofday(&t2, NULL);
-    pthread_mutex_lock(&rs);
-    read_web += (t2.tv_sec - t1.tv_sec) * 1000.0 + (t2.tv_usec - t1.tv_usec) / 1000.0;
-    pthread_mutex_unlock(&rs);
     MALLOC(pdt, post_param,1);
     pdt->fd = p->fd;
     pdt->buffer = p->buffer;
@@ -208,36 +204,39 @@ void check_data(void*param){
     pdt->hit = p->hit;
     thpool_add_work(post_pool, post_data, (void*)pdt);
     free(p);
+    pthread_mutex_lock(&rs);
+    read_web += (t2.tv_sec - t1.tv_sec) * 1000.0 + (t2.tv_usec - t1.tv_usec) / 1000.0;
+    pthread_mutex_unlock(&rs);
 }
 
-void post_data(void*param){
-    post_param*p = (post_param*)param;
+void post_data(void*param) {
+    post_param *p = (post_param *) param;
     struct timeval t1, t2;
-    int ret, file_fd;
     gettimeofday(&t1, NULL);
-    if ((file_fd = open(p->buffer+5, O_RDONLY)) == -1) { /* 打开指定的文件名*/
-        logger(NOTFOUND, "failed to open file", p->buffer+5, p->fd);
+    set_ret dt = read_set(cache, p->buffer + 5);
+    if (!dt.cache) {
+        logger(NOTFOUND, "failed to open file", p->buffer + 5, p->fd);
     } else {
         logger(LOG, "SEND", p->buffer + 5, p->hit);
-        long len = (long) lseek(file_fd, (off_t) 0, SEEK_END); /* 通过 lseek 获取文件长度*/
-        (void) lseek(file_fd, (off_t) 0, SEEK_SET); /* 将文件指针移到文件首位置*/
-        (void) sprintf(p->buffer,
-                       "HTTP/1.1 200 OK\nServer:nweb/%d.0\nContent-Length:%ld\nConnection:close\nContent-Type: %s\n\n",
-                       VERSION, len, p->fstr); /* Header + a blank line */
+        long len = dt.cost, cur_p = 0;
+        sprintf(p->buffer,
+                "HTTP/1.1 200 OK\nServer:nweb/%d.0\nContent-Length:%ld\nConnection:close\nContent-Type: %s\n\n",
+                VERSION, len, p->fstr); /* Header + a blank line */
         logger(LOG, "Header", p->buffer, p->hit);
-        (void) write(p->fd, p->buffer, strlen(p->buffer));
-        while ((ret = read(file_fd, p->buffer, BUFSIZE)) > 0) {
-            (void) write(p->fd, p->buffer, ret);
+        write(p->fd, p->buffer, strlen(p->buffer));
+        while(cur_p < len) {
+            long buflen = len - cur_p < BUFSIZE ? len - cur_p : BUFSIZE;
+            write(p->fd, dt.cache + cur_p, buflen);
+            cur_p += BUFSIZE;
         }
         usleep(1000);
-        close(file_fd);
     }
     close(p->fd);
     gettimeofday(&t2, NULL);
+    free(p);
     pthread_mutex_lock(&rs);
     post_dt += (t2.tv_sec - t1.tv_sec) * 1000.0 + (t2.tv_usec - t1.tv_usec) / 1000.0;
     pthread_mutex_unlock(&rs);
-    free(p);
 }
 
 
@@ -245,6 +244,7 @@ static void del_sig(int sig){
     thpool_destroy(deal_pool);
     thpool_destroy(data_pool);
     thpool_destroy(post_pool);
+    del_set(cache);
     puts("\n");
     printf("Total requests:\t%u\n", total);
     printf("read socket:\t%4.2fms/time\n", read_soc / total);
@@ -308,6 +308,7 @@ int main(int argc, char **argv) {
     deal_pool = thpool_init(50, "read_sock");
     data_pool = thpool_init(50, "read_html");
     post_pool = thpool_init(200, "post_data");
+    cache = new_set(5000, LRU);
     for (hit = 1;; ++hit) {
         length = sizeof(cli_addr);
         if ((socketfd = accept(listenfd, (struct sockaddr *) &cli_addr, &length)) < 0) {
