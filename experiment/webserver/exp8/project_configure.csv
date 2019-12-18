@@ -1,6 +1,6 @@
-compile_tool,gcc -O3,thpool.c cache.c memorypool.c -lpthread
+compile_tool,gcc -O3,cache.c thpool.c -lpthread
 compile_filename,webserver.c
-executable_filename,dist/exp7
+executable_filename,dist/exp6
 input_file,dist/input.txt
 template_root,template/
 server_target,2017011344@202.204.194.17:webserver/

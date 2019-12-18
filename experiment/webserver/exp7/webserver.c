@@ -47,7 +47,7 @@ double read_soc, post_dt, read_web, write_log;
 unsigned int total, tol_log = 0;
 pthread_mutex_t rs,wl;
 threadpool deal_pool, data_pool, post_pool;
-set_t cache;
+cache_t cache;
 
 void time_to_str(char*res){
     time_t t;
@@ -213,7 +213,7 @@ void post_data(void*param) {
     post_param *p = (post_param *) param;
     struct timeval t1, t2;
     gettimeofday(&t1, NULL);
-    set_ret dt = read_set(cache, p->buffer + 5);
+    cache_ret dt = read_cache(cache, p->buffer + 5);
     if (!dt.cache) {
         logger(NOTFOUND, "failed to open file", p->buffer + 5, p->fd);
     } else {
@@ -244,7 +244,7 @@ static void del_sig(int sig){
     thpool_destroy(deal_pool);
     thpool_destroy(data_pool);
     thpool_destroy(post_pool);
-    del_set(cache);
+    del_cache(cache);
     puts("\n");
     printf("Total requests:\t%u\n", total);
     printf("read socket:\t%4.2fms/time\n", read_soc / total);
@@ -308,7 +308,7 @@ int main(int argc, char **argv) {
     deal_pool = thpool_init(50, "read_sock");
     data_pool = thpool_init(50, "read_html");
     post_pool = thpool_init(200, "post_data");
-    cache = new_set(5000, LRU);
+    cache = new_cache(5000, LRU);
     for (hit = 1;; ++hit) {
         length = sizeof(cli_addr);
         if ((socketfd = accept(listenfd, (struct sockaddr *) &cli_addr, &length)) < 0) {
