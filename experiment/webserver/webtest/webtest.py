@@ -28,9 +28,9 @@ class HttpLoad(threading.Thread):
                     status[res.status_code] = 0
                     use_time[res.status_code] = []
                 status[res.status_code] += 1
-                use_time[res.status_code].append(end - start)
+                use_time[res.status_code].append((end - start) * 1000)
                 mutex.release()
-            except Exception as Ignored:
+            except Exception:
                 mutex.acquire()
                 if 'failed' not in status:
                     status['failed'] = 0
@@ -40,7 +40,7 @@ class HttpLoad(threading.Thread):
 
 if __name__ == '__main__':
     target = 'http://202.204.194.17:9168'
-    #target = 'https://www.baidu.com'
+    # target = 'https://www.baidu.com'
     mutex = threading.Lock()
     tls = []
     try:

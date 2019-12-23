@@ -313,7 +313,7 @@ int main(int argc, char **argv) {
     deal_pool = thpool_init(50, "read_sock");
     data_pool = thpool_init(100, "read_html");
     post_pool = thpool_init(200, "post_data");
-    cache = new_cache(5000, ARC);
+    cache = new_cache(5000, LFU);
     for (hit = 1;; ++hit) {
         length = sizeof(cli_addr);
         if ((socketfd = accept(listenfd, (struct sockaddr *) &cli_addr, &length)) < 0) {

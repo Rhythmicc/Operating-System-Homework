@@ -1,0 +1,6 @@
+compile_tool,gcc -std=gnu99 -O3,../fs.c
+compile_filename,main.c
+executable_filename,dist/test
+input_file,dist/input.txt
+template_root,template/
+server_target,

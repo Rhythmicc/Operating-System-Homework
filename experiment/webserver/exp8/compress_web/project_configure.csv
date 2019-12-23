@@ -1,0 +1,6 @@
+compile_tool,gcc -std=c11,../fs.c
+compile_filename,main.c
+executable_filename,dist/compress_web
+input_file,dist/input.txt
+template_root,template/
+server_target,

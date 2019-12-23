@@ -48,7 +48,7 @@ void del_cache_pair(cache_pair *del) {
 
 struct _cache {
     cache_pair table[HASHTABELSIZE], *first_table;      /// hash table
-    cache_ret (*f)(cache_t, const char *);                /// function pointer
+    cache_ret (*f)(cache_t, const char *);              /// function pointer
     pthread_mutex_t mutex;
     unsigned int capacity, _cur, first_cur, page_fault;
 };/// *set_t

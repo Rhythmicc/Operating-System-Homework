@@ -127,18 +127,20 @@ typedef struct {
     int lim;
     char*buffer;
     int fd,hit;
+    double rs;
 }read_param;
 
 typedef struct {
     int fd,hit;
     char*buffer,*fstr;
+    double rs, rw;
 }post_param;
 
 void deal(void*data) {
     webparam *p = (webparam *) data;
     int fd = p->fd, hit = p->hit;
     long i, ret;
-    char buffer[BUFSIZE + 1];
+    MALLOC(buffer, char, BUFSIZE+1);
     ret = read(fd, buffer, BUFSIZE);
     struct timeval t1, t2;
     gettimeofday(&t1, NULL);
@@ -162,14 +164,12 @@ void deal(void*data) {
         }
     }
     gettimeofday(&t2, NULL);
-    pthread_mutex_lock(&rs);
-    read_soc += (t2.tv_sec - t1.tv_sec) * 1000.0 + (t2.tv_usec - t1.tv_usec) / 1000.0;
-    pthread_mutex_unlock(&rs);
     MALLOC(rdt, read_param, 1);
     rdt->buffer = buffer;
     rdt->fd = fd;
     rdt->lim = i;
     rdt->hit = hit;
+    rdt->rs = (t2.tv_sec - t1.tv_sec) * 1000.0 + (t2.tv_usec - t1.tv_usec) / 1000.0;
     thpool_add_work(data_pool, check_data, (void *) rdt);
     free(p);
 }
@@ -198,14 +198,13 @@ void check_data(void*param){
     }
     if (fstr == 0)logger(FORBIDDEN, "file extension type not supported", p->buffer, p->fd);
     gettimeofday(&t2, NULL);
-    pthread_mutex_lock(&rs);
-    read_web += (t2.tv_sec - t1.tv_sec) * 1000.0 + (t2.tv_usec - t1.tv_usec) / 1000.0;
-    pthread_mutex_unlock(&rs);
     MALLOC(pdt, post_param,1);
     pdt->fd = p->fd;
     pdt->buffer = p->buffer;
     pdt->fstr = fstr;
     pdt->hit = p->hit;
+    pdt->rs = p->rs;
+    pdt->rw = (t2.tv_sec - t1.tv_sec) * 1000.0 + (t2.tv_usec - t1.tv_usec) / 1000.0;
     thpool_add_work(post_pool, post_data, (void*)pdt);
     free(p);
 }
@@ -235,8 +234,11 @@ void post_data(void*param){
     close(p->fd);
     gettimeofday(&t2, NULL);
     pthread_mutex_lock(&rs);
+    read_soc += p->rs;
+    read_web += p->rw;
     post_dt += (t2.tv_sec - t1.tv_sec) * 1000.0 + (t2.tv_usec - t1.tv_usec) / 1000.0;
     pthread_mutex_unlock(&rs);
+    free(p->buffer);
     free(p);
 }
 

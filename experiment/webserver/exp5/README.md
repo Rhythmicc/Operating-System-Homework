@@ -67,7 +67,7 @@ void time_to_str(char*res){
     time_t t;
     time (&t);
     struct tm *lt = localtime(&t);
-    sprintf(res, "%4d-%02d-%02d %02d:%02d:%02d\n",lt->tm_year+1900, lt->tm_mon, lt->tm_mday, lt->tm_hour, lt->tm_min, lt->tm_sec);
+    sprintf(res, "%4d-%02d-%02d %02d:%02d:%02d\n",lt->tm_year+1900, lt->tm_mon+1, lt->tm_mday, lt->tm_hour, lt->tm_min, lt->tm_sec);
 }
 
 /* 日志函数，将运行过程中的提示信息记录到 webserver.log 文件中*/
@@ -132,7 +132,7 @@ void logger(int type, char *s1, char *s2, int socket_fd) {
     pthread_mutex_unlock(&wl);
 }
 
-void read_data(void*param);
+void check_data(void*param);
 void post_data(void*param);
 
 typedef struct {
@@ -143,18 +143,20 @@ typedef struct {
     int lim;
     char*buffer;
     int fd,hit;
+    double rs;
 }read_param;
 
 typedef struct {
     int fd,hit;
     char*buffer,*fstr;
+    double rs, rw;
 }post_param;
 
 void deal(void*data) {
     webparam *p = (webparam *) data;
     int fd = p->fd, hit = p->hit;
     long i, ret;
-    char buffer[BUFSIZE + 1];
+    MALLOC(buffer, char, BUFSIZE+1);
     ret = read(fd, buffer, BUFSIZE);
     struct timeval t1, t2;
     gettimeofday(&t1, NULL);
@@ -178,19 +180,17 @@ void deal(void*data) {
         }
     }
     gettimeofday(&t2, NULL);
-    pthread_mutex_lock(&rs);
-    read_soc += (t2.tv_sec - t1.tv_sec) * 1000.0 + (t2.tv_usec - t1.tv_usec) / 1000.0;
-    pthread_mutex_unlock(&rs);
     MALLOC(rdt, read_param, 1);
     rdt->buffer = buffer;
     rdt->fd = fd;
     rdt->lim = i;
     rdt->hit = hit;
-    thpool_add_work(data_pool, read_data, (void*)rdt);
+    rdt->rs = (t2.tv_sec - t1.tv_sec) * 1000.0 + (t2.tv_usec - t1.tv_usec) / 1000.0;
+    thpool_add_work(data_pool, check_data, (void *) rdt);
     free(p);
 }
 
-void read_data(void*param){
+void check_data(void*param){
     read_param*p = (read_param*)param;
     struct timeval t1, t2;
     int i, j;
@@ -214,14 +214,13 @@ void read_data(void*param){
     }
     if (fstr == 0)logger(FORBIDDEN, "file extension type not supported", p->buffer, p->fd);
     gettimeofday(&t2, NULL);
-    pthread_mutex_lock(&rs);
-    read_web += (t2.tv_sec - t1.tv_sec) * 1000.0 + (t2.tv_usec - t1.tv_usec) / 1000.0;
-    pthread_mutex_unlock(&rs);
     MALLOC(pdt, post_param,1);
     pdt->fd = p->fd;
     pdt->buffer = p->buffer;
     pdt->fstr = fstr;
     pdt->hit = p->hit;
+    pdt->rs = p->rs;
+    pdt->rw = (t2.tv_sec - t1.tv_sec) * 1000.0 + (t2.tv_usec - t1.tv_usec) / 1000.0;
     thpool_add_work(post_pool, post_data, (void*)pdt);
     free(p);
 }
@@ -233,25 +232,29 @@ void post_data(void*param){
     gettimeofday(&t1, NULL);
     if ((file_fd = open(p->buffer+5, O_RDONLY)) == -1) { /* 打开指定的文件名*/
         logger(NOTFOUND, "failed to open file", p->buffer+5, p->fd);
+    } else {
+        logger(LOG, "SEND", p->buffer + 5, p->hit);
+        long len = (long) lseek(file_fd, (off_t) 0, SEEK_END); /* 通过 lseek 获取文件长度*/
+        (void) lseek(file_fd, (off_t) 0, SEEK_SET); /* 将文件指针移到文件首位置*/
+        (void) sprintf(p->buffer,
+                       "HTTP/1.1 200 OK\nServer:nweb/%d.0\nContent-Length:%ld\nConnection:close\nContent-Type: %s\n\n",
+                       VERSION, len, p->fstr); /* Header + a blank line */
+        logger(LOG, "Header", p->buffer, p->hit);
+        (void) write(p->fd, p->buffer, strlen(p->buffer));
+        while ((ret = read(file_fd, p->buffer, BUFSIZE)) > 0) {
+            (void) write(p->fd, p->buffer, ret);
+        }
+        usleep(1000);
+        close(file_fd);
     }
-    logger(LOG, "SEND", p->buffer+5, p->hit);
-    long len = (long) lseek(file_fd, (off_t) 0, SEEK_END); /* 通过 lseek 获取文件长度*/
-    (void) lseek(file_fd, (off_t) 0, SEEK_SET); /* 将文件指针移到文件首位置*/
-    (void) sprintf(p->buffer,
-                   "HTTP/1.1 200 OK\nServer:nweb/%d.0\nContent-Length:%ld\nConnection:close\nContent-Type: %s\n\n",
-                   VERSION, len, p->fstr); /* Header + a blank line */
-    logger(LOG, "Header", p->buffer, p->hit);
-    (void) write(p->fd, p->buffer, strlen(p->buffer));
-    while ((ret = read(file_fd, p->buffer, BUFSIZE)) > 0) {
-        (void) write(p->fd, p->buffer, ret);
-    }
-    usleep(1000);
-    close(file_fd);
     close(p->fd);
     gettimeofday(&t2, NULL);
     pthread_mutex_lock(&rs);
+    read_soc += p->rs;
+    read_web += p->rw;
     post_dt += (t2.tv_sec - t1.tv_sec) * 1000.0 + (t2.tv_usec - t1.tv_usec) / 1000.0;
     pthread_mutex_unlock(&rs);
+    free(p->buffer);
     free(p);
 }
 
@@ -310,7 +313,6 @@ int main(int argc, char **argv) {
     pthread_attr_t attr;
     pthread_attr_init(&attr);
     pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
-    pthread_t pth;
     serv_addr.sin_family = AF_INET;
     serv_addr.sin_addr.s_addr = htonl(INADDR_ANY);
     serv_addr.sin_port = htons(port);
@@ -321,9 +323,9 @@ int main(int argc, char **argv) {
     signal(SIGINT, del_sig);
     pthread_mutex_init(&rs,NULL);
     pthread_mutex_init(&wl,NULL);
-    deal_pool = thpool_init(100, "read_sock");
-    data_pool = thpool_init(100, "read_html");
-    post_pool = thpool_init(100, "post_data");
+    deal_pool = thpool_init(50, "read_sock");
+    data_pool = thpool_init(50, "read_html");
+    post_pool = thpool_init(200, "post_data");
     for (hit = 1;; ++hit) {
         length = sizeof(cli_addr);
         if ((socketfd = accept(listenfd, (struct sockaddr *) &cli_addr, &length)) < 0) {
@@ -349,19 +351,21 @@ int main(int argc, char **argv) {
 - 服务器输出：
 
 ```text
-Total requests:	1000
-read socket:	0.04ms/time
-read web:	0.00ms/time
-post data:	249.29ms/time
-write log:	0.03ms/time
+[2017011344@cupcs_ha2 webserver]$ run -br 9168 /usr/shiyou1/Crawler4jDate
+^C
+
+Total requests: 1000
+read socket:    0.61ms/time
+read web:       0.00ms/time
+post data:      32.58ms/time
+write log:      0.32ms/time
 ```
 
 - 测试端输出：
 
 ```text
-http status:     {200: 998, 404: 2}
-ms/time:         {200: 0.552, 404: 0.013}
-Total use time: 550.8852 ms
+http status:     {200: 1000}
+ms/time:         {200: 95.758}
 ```
 
 
@@ -490,19 +494,18 @@ post_data:	max work: 50	min work: 0	aver work: 10
 post_data	working time:	248.552
 
 
-Total requests:	1000
-read socket:	0.04ms/time
-read web:	0.00ms/time
-post data:	249.29ms/time
-write log:	0.03ms/time
+Total requests: 1000
+read socket:    2.22ms/time
+read web:       0.00ms/time
+post data:      34.07ms/time
+write log:      0.91ms/time
 ```
 
 - 测试端输出：
 
 ```tex
-http status:     {200: 998, 404: 2}
-ms/time:         {200: 0.552, 404: 0.013}
-Total use time: 550.8852 ms
+http status:     {200: 1000}
+ms/time:         {200: 86.978}
 ```
 
 
@@ -537,7 +540,6 @@ write log:	    0.03ms/time
 ```tex
 http status:     {200: 1000}
 ms/time:         {200: 0.14}
-Total use time: 139.6004 ms
 ```
 
 #### 服务性能显著提升

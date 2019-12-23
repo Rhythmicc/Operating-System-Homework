@@ -13,7 +13,7 @@
 #include <time.h>
 #include <pthread.h>
 #include "thpool.h"
-#include "cache.h"
+#include "fs.h"
 
 #define VERSION 23
 #define BUFSIZE 8096
@@ -26,6 +26,7 @@
 #endif
 #define RMALLOC(type,n) (type*)malloc(sizeof(type)*(n))
 #define MALLOC(p,type,n) type*p = RMALLOC(type, n)
+#define min(a, b) (a)<(b)?(a):(b)
 
 struct {
     char *ext;
@@ -47,7 +48,7 @@ double read_soc, post_dt, read_web, write_log;
 unsigned int total, tol_log = 0;
 pthread_mutex_t rs,wl;
 threadpool deal_pool, data_pool, post_pool;
-cache_t cache;
+fs_t fs;
 
 void time_to_str(char*res){
     time_t t;
@@ -129,19 +130,20 @@ typedef struct {
     int lim;
     char*buffer;
     int fd,hit;
+    double rs;
 }read_param;
 
 typedef struct {
     int fd,hit;
     char*buffer,*fstr;
-    cache_ret dt;
+    double rs, rw;
 }post_param;
 
 void deal(void*data) {
     webparam *p = (webparam *) data;
     int fd = p->fd, hit = p->hit;
     long i, ret;
-    MALLOC(buffer, char, BUFSIZE + 1);
+    MALLOC(buffer, char, BUFSIZE+1);
     ret = read(fd, buffer, BUFSIZE);
     struct timeval t1, t2;
     gettimeofday(&t1, NULL);
@@ -170,11 +172,9 @@ void deal(void*data) {
     rdt->fd = fd;
     rdt->lim = i;
     rdt->hit = hit;
+    rdt->rs = (t2.tv_sec - t1.tv_sec) * 1000.0 + (t2.tv_usec - t1.tv_usec) / 1000.0;
     thpool_add_work(data_pool, check_data, (void *) rdt);
     free(p);
-    pthread_mutex_lock(&rs);
-    read_soc += (t2.tv_sec - t1.tv_sec) * 1000.0 + (t2.tv_usec - t1.tv_usec) / 1000.0;
-    pthread_mutex_unlock(&rs);
 }
 
 void check_data(void*param){
@@ -183,10 +183,13 @@ void check_data(void*param){
     int i, j;
     gettimeofday(&t1, NULL);
     for (j = 0; j < p->lim - 1; j++)
+/* 在消息中检测路径，不允许路径中出现“.” */
         if (p->buffer[j] == '.' && p->buffer[j + 1] == '.')
             logger(FORBIDDEN, "Parent directory (..) path names not supported", p->buffer, p->fd);
     if (!strncmp(p->buffer, "GET /\0", 6) || !strncmp(p->buffer, "get /\0", 6))
-        strcpy(p->buffer, "GET /index.html");
+/* 如果请求消息中没有包含有效的文件名，则使用默认的文件名 index.html */
+        (void) strcpy(p->buffer, "GET /index.html");
+/* 根据预定义在 extensions 中的文件类型，检查请求的文件类型是否本服务器支持 */
     int buflen = strlen(p->buffer), len;
     char*fstr = (char *) 0;
     for (i = 0; extensions[i].ext != 0; i++) {
@@ -197,50 +200,53 @@ void check_data(void*param){
         }
     }
     if (fstr == 0)logger(FORBIDDEN, "file extension type not supported", p->buffer, p->fd);
-    cache_ret dt = read_cache(cache, p->buffer + 5);
     gettimeofday(&t2, NULL);
     MALLOC(pdt, post_param,1);
     pdt->fd = p->fd;
     pdt->buffer = p->buffer;
     pdt->fstr = fstr;
     pdt->hit = p->hit;
-    pdt->dt = dt;
+    pdt->rs = p->rs;
+    pdt->rw = (t2.tv_sec - t1.tv_sec) * 1000.0 + (t2.tv_usec - t1.tv_usec) / 1000.0;
     thpool_add_work(post_pool, post_data, (void*)pdt);
     free(p);
-    pthread_mutex_lock(&rs);
-    read_web += (t2.tv_sec - t1.tv_sec) * 1000.0 + (t2.tv_usec - t1.tv_usec) / 1000.0;
-    pthread_mutex_unlock(&rs);
 }
 
-void post_data(void*param) {
-    post_param *p = (post_param *) param;
-    cache_ret dt = p->dt;
+void post_data(void*param){
+    post_param*p = (post_param*)param;
     struct timeval t1, t2;
     gettimeofday(&t1, NULL);
-    if (!dt.cache) {
-        logger(NOTFOUND, "failed to open file", p->buffer + 5, p->fd);
+    fs_pair_t res = fs_read(fs, p->buffer + 5);
+    if (!res) { /* 打开指定的文件名*/
+        logger(NOTFOUND, "failed to open file", p->buffer+5, p->fd);
     } else {
         logger(LOG, "SEND", p->buffer + 5, p->hit);
-        long len = dt.cost, cur_p = 0;
-        sprintf(p->buffer,
-                "HTTP/1.1 200 OK\nServer:nweb/%d.0\nContent-Length:%ld\nConnection:close\nContent-Type: %s\n\n",
-                VERSION, len, p->fstr); /* Header + a blank line */
+        FILE*fp = fs->start_fp;
+        fseek(fp, res->excursion, SEEK_SET);
+
+        (void) sprintf(p->buffer,
+                       "HTTP/1.1 200 OK\nServer:nweb/%d.0\nContent-Length:%ld\nConnection:close\nContent-Type: %s\n\n",
+                       VERSION, (long)res->len, p->fstr); /* Header + a blank line */
         logger(LOG, "Header", p->buffer, p->hit);
-        write(p->fd, p->buffer, strlen(p->buffer));
-        while(cur_p < len) {
-            long buflen = len - cur_p < BUFSIZE ? len - cur_p : BUFSIZE;
-            write(p->fd, dt.cache + cur_p, buflen);
-            cur_p += BUFSIZE;
+        (void) write(p->fd, p->buffer, strlen(p->buffer));
+        unsigned len = res->len;
+        while(len) {
+            int cur = min(BUFSIZE, len);
+            for(int i=0;i<cur;++i)p->buffer[i] = fgetc(fp);
+            write(p->fd, p->buffer, cur);
+            len -= cur;
         }
         usleep(1000);
     }
     close(p->fd);
     gettimeofday(&t2, NULL);
-    free(p->buffer);
-    free(p);
     pthread_mutex_lock(&rs);
+    read_soc += p->rs;
+    read_web += p->rw;
     post_dt += (t2.tv_sec - t1.tv_sec) * 1000.0 + (t2.tv_usec - t1.tv_usec) / 1000.0;
     pthread_mutex_unlock(&rs);
+    free(p->buffer);
+    free(p);
 }
 
 
@@ -248,10 +254,9 @@ static void del_sig(int sig){
     thpool_destroy(deal_pool);
     thpool_destroy(data_pool);
     thpool_destroy(post_pool);
+    delete_fs(fs);
     puts("\n");
     printf("Total requests:\t%u\n", total);
-    printf("Total page fault:\t%u\n", cache_page_fault(cache));
-    del_cache(cache);
     printf("read socket:\t%4.2fms/time\n", read_soc / total);
     printf("read web:\t%4.2fms/time\n", read_web / total);
     printf("post data:\t%4.2fms/time\n", post_dt / total);
@@ -265,13 +270,12 @@ int main(int argc, char **argv) {
     static struct sockaddr_in cli_addr; /* static = initialised to zeros */
     static struct sockaddr_in serv_addr; /* static = initialised to zeros */
 /*解析命令参数*/
-    if (argc < 3 || argc > 3 || !strcmp(argv[1], "-?")) {
-        (void) printf("hint: nweb Port-Number Top-Directory\t\tversion %d\n\n"
+    if (argc != 2 || !strcmp(argv[1], "-?")) {
+        (void) printf("hint: nweb Port-Number\t\tversion %d\n\n"
                       "\tnweb is a small and very safe mini web server\n"
                       "\tnweb only servers out file/web pages with extensions named below\n"
-                      "\t and only from the named directory or its sub-directories.\n"
                       "\tThere is no fancy features = safe and secure.\n\n"
-                      "\tExample:webserver 8181 /home/nwebdir &\n\n"
+                      "\tExample:webserver 8181\n\n"
                       "\tOnly Supports:", VERSION);
         for (i = 0; extensions[i].ext != 0; i++)
             (void) printf(" %s", extensions[i].ext);
@@ -280,18 +284,8 @@ int main(int argc, char **argv) {
                       "\tNo warranty given or implied\n\tNigel Griffiths nag@uk.ibm.com\n");
         exit(0);
     }
-    if (!strncmp(argv[2], "/", 2) || !strncmp(argv[2], "/etc", 5) ||
-        !strncmp(argv[2], "/bin", 5) || !strncmp(argv[2], "/lib", 5) ||
-        !strncmp(argv[2], "/tmp", 5) || !strncmp(argv[2], "/usr", 5) ||
-        !strncmp(argv[2], "/dev", 5) || !strncmp(argv[2], "/sbin", 6)) {
-        (void) printf("ERROR: Bad top directory %s, see nweb -?\n", argv[2]);
-        exit(3);
-    }
-    if (chdir(argv[2]) == -1) {
-        (void) printf("ERROR: Can't Change to directory %s\n", argv[2]);
-        exit(4);
-    }
-
+    fs = fs_lead("fs", "fs_dt");
+    puts("fs start done");
     if ((listenfd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
         logger(ERROR, "system call", "socket", 0);
     port = atoi(argv[1]);
@@ -311,9 +305,8 @@ int main(int argc, char **argv) {
     pthread_mutex_init(&rs,NULL);
     pthread_mutex_init(&wl,NULL);
     deal_pool = thpool_init(50, "read_sock");
-    data_pool = thpool_init(100, "read_html");
+    data_pool = thpool_init(50, "read_html");
     post_pool = thpool_init(200, "post_data");
-    cache = new_cache(5000, ARC);
     for (hit = 1;; ++hit) {
         length = sizeof(cli_addr);
         if ((socketfd = accept(listenfd, (struct sockaddr *) &cli_addr, &length)) < 0) {

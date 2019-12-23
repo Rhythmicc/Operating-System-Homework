@@ -21,22 +21,31 @@
 extern "C" {
 #endif
 
-typedef struct hash_set *set_t, hash_set;
-typedef struct _ele hashpair;
-typedef struct _ret {
+typedef struct _cache *cache_t, _cache;
+typedef struct _cache_ele cache_pair;
+typedef struct _cache_ret {
     long cost;
     const char*cache;
-}set_ret;
+}cache_ret;
+/**
+ * @API
+ * create, delete, search, read
+ */
+cache_t   new_cache        (unsigned capacity, cache_ret(*model)(cache_t, const char*));
+void      del_cache        (cache_t cache);
+unsigned  cache_page_fault (cache_t cache);
+cache_ret read_cache       (cache_t cache, const char*filename);
 
-set_t new_set(unsigned capacity, set_ret(*f)(set_t, const char*));
-void del_set(set_t set);
-set_ret read_set(set_t set, const char*filename);
-set_ret LRU(set_t set, const char*request);
-set_ret LFU(set_t set, const char*request);
-set_ret ARC(set_t set, const char*request);
-set_ret MQ(set_t set, const char*request);
-set_ret GD(set_t set, const char*request);
-set_ret GDSF(set_t set, const char*request);
+/**
+ * @Cache_Algorithm_Model
+ * cache_ret(*)(cache_t, const char*)
+ */
+cache_ret LRU (cache_t cache, const char*request);
+cache_ret LFU (cache_t cache, const char*request);
+cache_ret ARC (cache_t cache, const char*request);
+cache_ret MQ  (cache_t cache, const char*request);
+cache_ret GD  (cache_t cache, const char*request);
+cache_ret GDSF(cache_t cache, const char*request);
 
 #ifdef __cplusplus
 }
@@ -62,20 +71,20 @@ set_ret GDSF(set_t set, const char*request);
   - 哈希表存储单元、哈希表数据结构
 
   ```c
-  struct _ele {
+  struct _cache_ele {
       char *key, *file_cache;
       long cost;
       struct timeval pre_t;
       unsigned int cnt;
-      struct _ele *nxt, *pre;
+      struct _cache_ele *nxt, *pre;
   };
   
-  struct hash_set {
-      hashpair table[HASHTABELSIZE], *first_table;      /// hash table
-      set_ret (*f)(set_t, const char *);                /// function pointer
+  struct _cache {
+      cache_pair table[HASHTABELSIZE], *first_table;      /// hash table
+      cache_ret (*f)(cache_t, const char *);              /// function pointer
       pthread_mutex_t mutex;
-      unsigned int capacity, _cur, first_cur;
-  };/// *set_t
+      unsigned int capacity, _cur, first_cur, page_fault;
+  };/// *cache_t
   ```
 
 ```c
@@ -87,7 +96,6 @@ set_ret GDSF(set_t set, const char*request);
 #include "string.h"
 #include <sys/time.h>
 #include <fcntl.h>
-#include "thpool.h"
 
 #define RMALLOC(type,n) (type*)malloc(sizeof(type)*(n))
 #define MALLOC(p,type,n) type*p = RMALLOC(type, n)
@@ -106,92 +114,96 @@ unsigned int string_hash(const char *str) {
     return (hash & 0x7FFFFFFF);
 }
 
-struct _ele {
+struct _cache_ele {
     char *key, *file_cache;
     long cost;
     struct timeval pre_t;
     unsigned int cnt;
-    struct _ele *nxt, *pre;
+    struct _cache_ele *nxt, *pre;
 };
 
-hashpair*new_hashpair(){
-    MALLOC(res, hashpair, 1);
+cache_pair*new_cache_pair(){
+    MALLOC(res, cache_pair, 1);
     res->key = res->file_cache = NULL;
     res->cnt = res->cost = 0;
     res->nxt = res->pre = NULL;
     return res;
 }
 
-void del_hashpair(hashpair *del) {
+void del_cache_pair(cache_pair *del) {
     free(del->key);
     free(del->file_cache);
     free(del);
 }
 
-struct hash_set {
-    hashpair table[HASHTABELSIZE], *first_table;      /// hash table
-    set_ret (*f)(set_t, const char *);                /// function pointer
+struct _cache {
+    cache_pair table[HASHTABELSIZE], *first_table;      /// hash table
+    cache_ret (*f)(cache_t, const char *);              /// function pointer
     pthread_mutex_t mutex;
-    unsigned int capacity, _cur, first_cur;
-};/// *set_t
+    unsigned int capacity, _cur, first_cur, page_fault;
+};/// *cache_t
 
-set_t new_set(unsigned capacity, set_ret(*f)(set_t, const char *)) {
-    if (f) {
-        MALLOC(ret, hash_set, 1);
+cache_t new_cache(unsigned capacity, cache_ret(*model)(cache_t, const char *)) {
+    if (model) {
+        MALLOC(ret, _cache, 1);
         pthread_mutex_init(&ret->mutex, NULL);
         ret->capacity = capacity;
-        ret->first_cur = ret->_cur = 0;
-        memset(ret->table, 0, sizeof(hashpair) * HASHTABELSIZE);
-        if (f == ARC)ret->first_table = RMALLOC(hashpair, HASHTABELSIZE);
-        else if(f == MQ)ret->first_table = RMALLOC(hashpair, HASHTABELSIZE * 3);
+        ret->page_fault = ret->first_cur = ret->_cur = 0;
+        memset(ret->table, 0, sizeof(cache_pair) * HASHTABELSIZE);
+        if (model == ARC)ret->first_table = RMALLOC(cache_pair, HASHTABELSIZE);
+        else if(model == MQ)ret->first_table = RMALLOC(cache_pair, HASHTABELSIZE * 3);
         else ret->first_table = NULL;
-        ret->f = f;
+        ret->f = model;
         return ret;
     }
     return NULL;
 }
 
-set_ret read_set(set_t set, const char *filename) {
-    pthread_mutex_lock(&set->mutex);
-    set_ret res = set->f(set, filename);
-    pthread_mutex_unlock(&set->mutex);
+cache_ret read_cache(cache_t cache, const char *filename) {
+    pthread_mutex_lock(&cache->mutex);
+    cache_ret res = cache->f(cache, filename);
+    pthread_mutex_unlock(&cache->mutex);
     return res;
 }
 
-void del_set(set_t set) {
-    pthread_mutex_destroy(&set->mutex);
-    for (int i = 0; i < HASHTABELSIZE; ++i) {
-        hashpair *p = set->table[i].nxt;
-        while (p) {
-            hashpair *tmp = p;
-            p = p->nxt;
-            del_hashpair(tmp);
-        }
-    }
-    if (set->first_table) {
-        for (int i = 0; i < HASHTABELSIZE; ++i) {
-            hashpair *p = set->first_table[i].nxt;
-            while (p) {
-                hashpair *tmp = p;
-                p = p->nxt;
-                del_hashpair(tmp);
-            }
-        }
-        free(set->first_table);
-    }
-    free(set);
+unsigned cache_page_fault(cache_t cache){
+    return cache->page_fault;
 }
 
-hashpair *is_in_table(hashpair *table, const char *request, int *ret) {
+void del_cache(cache_t cache) {
+    pthread_mutex_destroy(&cache->mutex);
+    for (int i = 0; i < HASHTABELSIZE; ++i) {
+        cache_pair *p = cache->table[i].nxt;
+        while (p) {
+            cache_pair *tmp = p;
+            p = p->nxt;
+            del_cache_pair(tmp);
+        }
+    }
+    if (cache->first_table) {
+        for (int i = 0; i < HASHTABELSIZE; ++i) {
+            cache_pair *p = cache->first_table[i].nxt;
+            while (p) {
+                cache_pair *tmp = p;
+                p = p->nxt;
+                del_cache_pair(tmp);
+            }
+        }
+        free(cache->first_table);
+    }
+    free(cache);
+}
+
+cache_pair *is_in_table(cache_pair *table, const char *request, int *ret) {
     unsigned int index = string_hash(request) % HASHTABELSIZE;
-    hashpair *src = table + index;
+    cache_pair *src = table + index;
     if (!src->nxt) {
         *ret = 0;
         return src;
     }
     src = src->nxt;
     while (strcmp(src->key, request)) {
-        hashpair *pre = src;
+        cache_pair *pre = src;
         src = src->nxt;
         if (!src) { /// not in table: return pre node
             *ret = 0;
@@ -202,7 +214,7 @@ hashpair *is_in_table(hashpair *table, const char *request, int *ret) {
     return src;
 }
 
-void replace_after_src(hashpair *src, const char *request) {
+void replace_after_src(cache_pair *src, const char *request) {
     src = src->nxt;
     src->cnt = 1;
     gettimeofday(&src->pre_t, NULL);
@@ -223,13 +235,13 @@ void replace_after_src(hashpair *src, const char *request) {
     }
 }
 
-void add_after_src(hashpair *src, const char *request) {
-    src->nxt = new_hashpair();
+void add_after_src(cache_pair *src, const char *request) {
+    src->nxt = new_cache_pair();
     src->nxt->pre = src;
     replace_after_src(src, request);
 }
 
-void replace_copy(hashpair *src, hashpair *aim) {
+void replace_copy(cache_pair *src, cache_pair *aim) {
     src = src->nxt;
     src->cnt = aim->cnt;
     gettimeofday(&src->pre_t, NULL);
@@ -242,20 +254,20 @@ void replace_copy(hashpair *src, hashpair *aim) {
     free(aim);
 }
 
-void add_copy(hashpair *src, hashpair *aim) {
-    src->nxt = new_hashpair();
+void add_copy(cache_pair *src, cache_pair *aim) {
+    src->nxt = new_cache_pair();
     src->nxt->pre = src;
     replace_copy(src, aim);
 }
 
-hashpair *LRU_CHOOSE(hashpair *table) {
+cache_pair *LRU_CHOOSE(cache_pair *table) {
     double mn = -1;
-    hashpair *res = NULL;
+    cache_pair *res = NULL;
     for (int i = 0; i < HASHTABELSIZE; ++i)
         if (table[i].nxt) {
-            hashpair *ptr = table + i;
+            cache_pair *ptr = table + i;
             while (ptr->nxt) {
-                hashpair *pre = ptr;
+                cache_pair *pre = ptr;
                 ptr = ptr->nxt;
                 double cur = ptr->pre_t.tv_sec * 1000.0 + ptr->pre_t.tv_usec / 1000.0;
                 if (mn < 0 || cur < mn) {
@@ -267,14 +279,14 @@ hashpair *LRU_CHOOSE(hashpair *table) {
     return res;
 }
 
-hashpair *LFU_CHOOSE(hashpair *table) {
+cache_pair *LFU_CHOOSE(cache_pair *table) {
     int mn = -1;
-    hashpair *res = NULL;
+    cache_pair *res = NULL;
     for (int i = 0; i < HASHTABELSIZE; ++i)
         if (table[i].nxt) {
-            hashpair *ptr = table + i;
+            cache_pair *ptr = table + i;
             while (ptr->nxt) {
-                hashpair *pre = ptr;
+                cache_pair *pre = ptr;
                 ptr = ptr->nxt;
                 int cur = ptr->cnt;
                 if (mn < 0 || cur < mn) {
@@ -286,14 +298,14 @@ hashpair *LFU_CHOOSE(hashpair *table) {
     return res;
 }
 
-hashpair *GD_CHOOSE(hashpair *table) {
+cache_pair *GD_CHOOSE(cache_pair *table) {
     double mn = -1;
-    hashpair *res = NULL;
+    cache_pair *res = NULL;
     for (int i = 0; i < HASHTABELSIZE; ++i)
         if (table[i].nxt) {
-            hashpair *ptr = table + i;
+            cache_pair *ptr = table + i;
             while (ptr->nxt) {
-                hashpair *pre = ptr;
+                cache_pair *pre = ptr;
                 ptr = ptr->nxt;
                 double cur = ptr->cost + ptr->pre_t.tv_sec;
                 if (mn < 0 || cur < mn) {
@@ -305,14 +317,14 @@ hashpair *GD_CHOOSE(hashpair *table) {
     return res;
 }
 
-hashpair *GDSF_CHOOSE(hashpair *table) {
+cache_pair *GDSF_CHOOSE(cache_pair *table) {
     double mn = -1;
-    hashpair *res = NULL;
+    cache_pair *res = NULL;
     for (int i = 0; i < HASHTABELSIZE; ++i)
         if (table[i].nxt) {
-            hashpair *ptr = table + i;
+            cache_pair *ptr = table + i;
             while (ptr->nxt) {
-                hashpair *pre = ptr;
+                cache_pair *pre = ptr;
                 ptr = ptr->nxt;
                 double cur = ptr->cnt * ptr->cost + ptr->pre_t.tv_sec;
                 if (mn < 0 || cur < mn) {
@@ -324,147 +336,152 @@ hashpair *GDSF_CHOOSE(hashpair *table) {
     return res;
 }
 
-set_ret LRU(set_t set, const char *request) {
+cache_ret LRU(cache_t cache, const char *request) {
     int flag;
-    hashpair *src = is_in_table(set->table, request, &flag);
+    cache_pair *src = is_in_table(cache->table, request, &flag);
     if (flag) { /// real node
         src->cnt++;
         gettimeofday(&src->pre_t, NULL);
     } else { /// pre node
-        if (set->_cur == set->capacity) { /// choose and replace
-            src = LRU_CHOOSE(set->table);
+        ++cache->page_fault;
+        if (cache->_cur == cache->capacity) { /// choose and replace
+            src = LRU_CHOOSE(cache->table);
             replace_after_src(src, request);
         } else { /// add node
             add_after_src(src, request);
-            ++set->_cur;
+            ++cache->_cur;
         }
         src = src->nxt;
     }
-    return (set_ret) {src->cost, src->file_cache};
+    return (cache_ret) {src->cost, src->file_cache};
 }
 
-set_ret LFU(set_t set, const char *request) {
+cache_ret LFU(cache_t cache, const char *request) {
     int flag;
-    hashpair *src = is_in_table(set->table, request, &flag);
+    cache_pair *src = is_in_table(cache->table, request, &flag);
     if (flag) {
         src->cnt++;
         gettimeofday(&src->pre_t, NULL);
     } else {
-        if (set->_cur == set->capacity) {
-            src = LFU_CHOOSE(set->table);
+        ++cache->page_fault;
+        if (cache->_cur == cache->capacity) {
+            src = LFU_CHOOSE(cache->table);
             replace_after_src(src, request);
         } else {
             add_after_src(src, request);
-            ++set->_cur;
+            ++cache->_cur;
         }
         src = src->nxt;
     }
-    return (set_ret) {src->cost, src->file_cache};
+    return (cache_ret) {src->cost, src->file_cache};
 }
 
-set_ret ARC(set_t set, const char *request) {
+cache_ret ARC(cache_t cache, const char *request) {
     int flag;
-    hashpair *first_table = set->first_table;
-    hashpair *src = is_in_table(set->table, request, &flag);
+    cache_pair *first_table = cache->first_table;
+    cache_pair *src = is_in_table(cache->table, request, &flag);
     if (flag) { /// in second table
         src->cnt++;
         gettimeofday(&src->pre_t, NULL);
     } else {
-        hashpair *first_src = is_in_table(first_table, request, &flag);
+        cache_pair *first_src = is_in_table(first_table, request, &flag);
         if (flag) { /// in first table
             ++first_src->cnt;
-            if (set->_cur == set->capacity) { /// choose and replace
-                src = LRU_CHOOSE(set->table);
+            if (cache->_cur == cache->capacity) { /// choose and replace
+                src = LRU_CHOOSE(cache->table);
                 replace_copy(src, first_src); /// copy data to nxt src and delete first_src
             } else { /// add node
                 add_copy(src, first_src); /// create node and replace
-                ++set->_cur;
+                ++cache->_cur;
             }
             src = src->nxt;
         } else { /// not in first table
-            if (set->first_cur == set->capacity) {
+            ++cache->page_fault;
+            if (cache->first_cur == cache->capacity) {
                 first_src = LRU_CHOOSE(first_table);
                 replace_after_src(first_src, request);
             } else {
                 add_after_src(first_src, request);
-                ++set->first_cur;
+                ++cache->first_cur;
             }
             src = first_src->nxt;
         }
     }
-    return (set_ret) {src->cost, src->file_cache};
+    return (cache_ret) {src->cost, src->file_cache};
 }
 
-set_ret MQ(set_t set, const char *request) {
+cache_ret MQ(cache_t cache, const char *request) {
     int flag;
-    hashpair *first_table = set->first_table;
-    hashpair *src = is_in_table(set->table, request, &flag);
+    cache_pair *first_table = cache->first_table;
+    cache_pair *src = is_in_table(cache->table, request, &flag);
     if (flag) { /// in second table
         src->cnt++;
         gettimeofday(&src->pre_t, NULL);
     } else {
-        hashpair *first_src = is_in_table(first_table, request, &flag);
+        cache_pair *first_src = is_in_table(first_table, request, &flag);
         if (flag) { /// in first table
             ++first_src->cnt;
-            if (set->_cur == set->capacity) { /// choose and replace
-                src = LRU_CHOOSE(set->table);
+            if (cache->_cur == cache->capacity) { /// choose and replace
+                src = LRU_CHOOSE(cache->table);
                 replace_copy(src, first_src); /// copy data to nxt src and delete first_src
             } else { /// add node
                 add_copy(src, first_src); /// create node and replace
-                ++set->_cur;
+                ++cache->_cur;
             }
             src = src->nxt;
         } else { /// not in first table
-            if (set->first_cur == set->capacity) {
+            ++cache->page_fault;
+            if (cache->first_cur == cache->capacity) {
                 first_src = LRU_CHOOSE(first_table);
                 replace_after_src(first_src, request);
             } else {
                 add_after_src(first_src, request);
-                ++set->first_cur;
+                ++cache->first_cur;
             }
             src = first_src->nxt;
         }
     }
-    return (set_ret) {src->cost, src->file_cache};
+    return (cache_ret) {src->cost, src->file_cache};
 }
 
-set_ret GD(set_t set, const char *request) {
+cache_ret GD(cache_t cache, const char *request) {
     int flag;
-    hashpair *src = is_in_table(set->table, request, &flag);
+    cache_pair *src = is_in_table(cache->table, request, &flag);
     if (flag) {
         src->cnt++;
         gettimeofday(&src->pre_t, NULL);
     } else {
-
-        if (set->_cur == set->capacity) {
-            src = GD_CHOOSE(set->table);
+        ++cache->page_fault;
+        if (cache->_cur == cache->capacity) {
+            src = GD_CHOOSE(cache->table);
             replace_after_src(src, request);
         } else {
             add_after_src(src, request);
-            ++set->_cur;
+            ++cache->_cur;
         }
         src = src->nxt;
     }
-    return (set_ret) {src->cost, src->file_cache};
+    return (cache_ret) {src->cost, src->file_cache};
 }
 
-set_ret GDSF(set_t set, const char *request) {
+cache_ret GDSF(cache_t cache, const char *request) {
     int flag;
-    hashpair *src = is_in_table(set->table, request, &flag);
+    cache_pair *src = is_in_table(cache->table, request, &flag);
     if (flag) {
         src->cnt++;
         gettimeofday(&src->pre_t, NULL);
     } else {
-        if (set->_cur == set->capacity) {
-            src = GDSF_CHOOSE(set->table);
+        ++cache->page_fault;
+        if (cache->_cur == cache->capacity) {
+            src = GDSF_CHOOSE(cache->table);
             replace_after_src(src, request);
         } else {
             add_after_src(src, request);
-            ++set->_cur;
+            ++cache->_cur;
         }
         src = src->nxt;
     }
-    return (set_ret) {src->cost, src->file_cache};
+    return (cache_ret) {src->cost, src->file_cache};
 }
 ```
 
@@ -561,42 +578,40 @@ set_ret GDSF(set_t set, const char *request) {
   - Server:
 
   ```text
-  Total requests:	1000
-  Total page fault:	994
-  read socket:	0.05ms/time
-  read web:	3.89ms/time
-  post data:	222.09ms/time
-  write log:	0.03ms/tim
+  Total requests: 1000
+  Total page fault:       991
+  read socket:    0.17ms/time
+  read web:       99.57ms/time
+  post data:      13.38ms/time
+  write log:      0.14ms/time
   ```
 
   - Client:
 
   ```text
-  http status:	 {200: 1000}
-  ms/time:	 {200: 0.706}
-  Total use time: 706.1137 ms
+  http status:     {200: 1000}
+  ms/time:         {200: 143.154}
   ```
-
+  
 - LFU
   - Server:
 
   ```text
-  Total requests:	1000
-  Total page fault:	995
-  read socket:	0.05ms/time
-  read web:	4.55ms/time
-  post data:	203.66ms/time
-  write log:	0.03ms/time
+  Total requests: 1000
+  Total page fault:       994
+  read socket:    0.20ms/time
+  read web:       98.00ms/time
+  post data:      15.89ms/time
+  write log:      0.16ms/time
   ```
 
   - Client:
 
   ```text
-  http status:	 {200: 1000}
-  ms/time:	 {200: 0.628}
-  Total use time: 628.0187 ms
+  http status:     {200: 1000}
+  ms/time:         {200: 149.437}
   ```
-
+  
 - ARC
 
   - Server:
@@ -613,11 +628,10 @@ set_ret GDSF(set_t set, const char *request) {
   - Client:
 
   ```text
-  http status:	 {200: 1000}
-  ms/time:	 {200: 0.595}
-  Total use time: 594.5521 ms
+  http status:     {200: 1000}
+  ms/time:         {200: 146.139}
   ```
-
+  
 - MQ
 
   - Server:
@@ -634,51 +648,48 @@ set_ret GDSF(set_t set, const char *request) {
   - Client:
 
   ```text
-  http status:	 {200: 1000}
-  ms/time:	 {200: 0.731}
-  Total use time: 731.1264 ms
+  http status:     {200: 1000}
+  ms/time:         {200: 147.935}
   ```
-
+  
 - GD
 
   - Server:
 
   ```text
-  Total requests:	1000
-  Total page fault:	996
-  read socket:	0.05ms/time
-  read web:	2.32ms/time
-  post data:	275.70ms/time
-  write log:	0.03ms/time
+  Total requests: 1000
+  Total page fault:       994
+  read socket:    0.24ms/time
+  read web:       94.91ms/time
+  post data:      15.64ms/time
+  write log:      0.17ms/time
   ```
 
   - Client:
 
   ```text
-  http status:	 {200: 1000}
-  ms/time:	 {200: 0.84}
-  Total use time: 839.9940 ms
+  http status:     {200: 1000}
+  ms/time:         {200: 144.034}
   ```
-
+  
 - GDSF
 
   - Server:
 
   ```text
-  Total requests:	1000
-  Total page fault:	995
-  read socket:	0.05ms/time
-  read web:	11.06ms/time
-  post data:	129.04ms/time
-  write log:	0.03ms/time
+  Total requests: 1000
+  Total page fault:       990
+  read socket:    0.32ms/time
+  read web:       106.63ms/time
+  post data:      12.33ms/time
+  write log:      0.19ms/time
   ```
 
   - Client:
 
   ```text
-  http status:	 {200: 1000}
-  ms/time:	 {200: 0.443}
-  Total use time: 442.4360 ms
+  http status:     {200: 1000}
+  ms/time:         {200: 143.102}
   ```
 
 ## 题目3

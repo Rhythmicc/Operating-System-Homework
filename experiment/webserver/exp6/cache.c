@@ -51,7 +51,7 @@ struct _cache {
     cache_ret (*f)(cache_t, const char *);              /// function pointer
     pthread_mutex_t mutex;
     unsigned int capacity, _cur, first_cur, page_fault;
-};/// *cache_t
+};/// *set_t
 
 cache_t new_cache(unsigned capacity, cache_ret(*model)(cache_t, const char *)) {
     if (model) {
@@ -246,50 +246,50 @@ cache_pair *GDSF_CHOOSE(cache_pair *table) {
     return res;
 }
 
-cache_ret LRU(cache_t cache, const char *request) {
+cache_ret LRU(cache_t set, const char *request) {
     int flag;
-    cache_pair *src = is_in_table(cache->table, request, &flag);
+    cache_pair *src = is_in_table(set->table, request, &flag);
     if (flag) { /// real node
         src->cnt++;
         gettimeofday(&src->pre_t, NULL);
     } else { /// pre node
-        ++cache->page_fault;
-        if (cache->_cur == cache->capacity) { /// choose and replace
-            src = LRU_CHOOSE(cache->table);
+        ++set->page_fault;
+        if (set->_cur == set->capacity) { /// choose and replace
+            src = LRU_CHOOSE(set->table);
             replace_after_src(src, request);
         } else { /// add node
             add_after_src(src, request);
-            ++cache->_cur;
+            ++set->_cur;
         }
         src = src->nxt;
     }
     return (cache_ret) {src->cost, src->file_cache};
 }
 
-cache_ret LFU(cache_t cache, const char *request) {
+cache_ret LFU(cache_t set, const char *request) {
     int flag;
-    cache_pair *src = is_in_table(cache->table, request, &flag);
+    cache_pair *src = is_in_table(set->table, request, &flag);
     if (flag) {
         src->cnt++;
         gettimeofday(&src->pre_t, NULL);
     } else {
-        ++cache->page_fault;
-        if (cache->_cur == cache->capacity) {
-            src = LFU_CHOOSE(cache->table);
+        ++set->page_fault;
+        if (set->_cur == set->capacity) {
+            src = LFU_CHOOSE(set->table);
             replace_after_src(src, request);
         } else {
             add_after_src(src, request);
-            ++cache->_cur;
+            ++set->_cur;
         }
         src = src->nxt;
     }
     return (cache_ret) {src->cost, src->file_cache};
 }
 
-cache_ret ARC(cache_t cache, const char *request) {
+cache_ret ARC(cache_t set, const char *request) {
     int flag;
-    cache_pair *first_table = cache->first_table;
-    cache_pair *src = is_in_table(cache->table, request, &flag);
+    cache_pair *first_table = set->first_table;
+    cache_pair *src = is_in_table(set->table, request, &flag);
     if (flag) { /// in second table
         src->cnt++;
         gettimeofday(&src->pre_t, NULL);
@@ -297,22 +297,22 @@ cache_ret ARC(cache_t cache, const char *request) {
         cache_pair *first_src = is_in_table(first_table, request, &flag);
         if (flag) { /// in first table
             ++first_src->cnt;
-            if (cache->_cur == cache->capacity) { /// choose and replace
-                src = LRU_CHOOSE(cache->table);
+            if (set->_cur == set->capacity) { /// choose and replace
+                src = LRU_CHOOSE(set->table);
                 replace_copy(src, first_src); /// copy data to nxt src and delete first_src
             } else { /// add node
                 add_copy(src, first_src); /// create node and replace
-                ++cache->_cur;
+                ++set->_cur;
             }
             src = src->nxt;
         } else { /// not in first table
-            ++cache->page_fault;
-            if (cache->first_cur == cache->capacity) {
+            ++set->page_fault;
+            if (set->first_cur == set->capacity) {
                 first_src = LRU_CHOOSE(first_table);
                 replace_after_src(first_src, request);
             } else {
                 add_after_src(first_src, request);
-                ++cache->first_cur;
+                ++set->first_cur;
             }
             src = first_src->nxt;
         }
@@ -320,10 +320,10 @@ cache_ret ARC(cache_t cache, const char *request) {
     return (cache_ret) {src->cost, src->file_cache};
 }
 
-cache_ret MQ(cache_t cache, const char *request) {
+cache_ret MQ(cache_t set, const char *request) {
     int flag;
-    cache_pair *first_table = cache->first_table;
-    cache_pair *src = is_in_table(cache->table, request, &flag);
+    cache_pair *first_table = set->first_table;
+    cache_pair *src = is_in_table(set->table, request, &flag);
     if (flag) { /// in second table
         src->cnt++;
         gettimeofday(&src->pre_t, NULL);
@@ -331,22 +331,22 @@ cache_ret MQ(cache_t cache, const char *request) {
         cache_pair *first_src = is_in_table(first_table, request, &flag);
         if (flag) { /// in first table
             ++first_src->cnt;
-            if (cache->_cur == cache->capacity) { /// choose and replace
-                src = LRU_CHOOSE(cache->table);
+            if (set->_cur == set->capacity) { /// choose and replace
+                src = LRU_CHOOSE(set->table);
                 replace_copy(src, first_src); /// copy data to nxt src and delete first_src
             } else { /// add node
                 add_copy(src, first_src); /// create node and replace
-                ++cache->_cur;
+                ++set->_cur;
             }
             src = src->nxt;
         } else { /// not in first table
-            ++cache->page_fault;
-            if (cache->first_cur == cache->capacity) {
+            ++set->page_fault;
+            if (set->first_cur == set->capacity) {
                 first_src = LRU_CHOOSE(first_table);
                 replace_after_src(first_src, request);
             } else {
                 add_after_src(first_src, request);
-                ++cache->first_cur;
+                ++set->first_cur;
             }
             src = first_src->nxt;
         }
@@ -354,40 +354,40 @@ cache_ret MQ(cache_t cache, const char *request) {
     return (cache_ret) {src->cost, src->file_cache};
 }
 
-cache_ret GD(cache_t cache, const char *request) {
+cache_ret GD(cache_t set, const char *request) {
     int flag;
-    cache_pair *src = is_in_table(cache->table, request, &flag);
+    cache_pair *src = is_in_table(set->table, request, &flag);
     if (flag) {
         src->cnt++;
         gettimeofday(&src->pre_t, NULL);
     } else {
-        ++cache->page_fault;
-        if (cache->_cur == cache->capacity) {
-            src = GD_CHOOSE(cache->table);
+        ++set->page_fault;
+        if (set->_cur == set->capacity) {
+            src = GD_CHOOSE(set->table);
             replace_after_src(src, request);
         } else {
             add_after_src(src, request);
-            ++cache->_cur;
+            ++set->_cur;
         }
         src = src->nxt;
     }
     return (cache_ret) {src->cost, src->file_cache};
 }
 
-cache_ret GDSF(cache_t cache, const char *request) {
+cache_ret GDSF(cache_t set, const char *request) {
     int flag;
-    cache_pair *src = is_in_table(cache->table, request, &flag);
+    cache_pair *src = is_in_table(set->table, request, &flag);
     if (flag) {
         src->cnt++;
         gettimeofday(&src->pre_t, NULL);
     } else {
-        ++cache->page_fault;
-        if (cache->_cur == cache->capacity) {
-            src = GDSF_CHOOSE(cache->table);
+        ++set->page_fault;
+        if (set->_cur == set->capacity) {
+            src = GDSF_CHOOSE(set->table);
             replace_after_src(src, request);
         } else {
             add_after_src(src, request);
-            ++cache->_cur;
+            ++set->_cur;
         }
         src = src->nxt;
     }
