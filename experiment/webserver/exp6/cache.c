@@ -51,7 +51,7 @@ struct _cache {
     cache_ret (*f)(cache_t, const char *);              /// function pointer
     pthread_mutex_t mutex;
     unsigned int capacity, _cur, first_cur, page_fault;
-};/// *set_t
+};/// *cache_t
 
 cache_t new_cache(unsigned capacity, cache_ret(*model)(cache_t, const char *)) {
     if (model) {

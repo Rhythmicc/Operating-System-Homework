@@ -670,20 +670,20 @@ int main(int argc, char **argv) {
 fs start done
 ^C
 
-Total requests: 1000
-read socket:    0.65ms/time
-read web:       0.00ms/time
-post data:      920.76ms/time
-write log:      0.28ms/time
+Total requests:	1000
+read socket:	  0.13ms/time
+read web:	      0.00ms/time
+post data:     	691.94ms/time
+write log:	    0.07ms/time
 ```
 
 - 测试端：
 
 ```shell
 ➜ webtest master $ run 20 1000
-http status:     {200: 1000}
-ms/time:         {200: 1066}
-Total use time: 1065.6913 s
+http status:	 {200: 1000}
+ms/time:     	 {200: 697.641}
+Total use time: 697641.0984 ms
 ```
 
 - 分析：

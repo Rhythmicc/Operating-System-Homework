@@ -40,7 +40,6 @@ class HttpLoad(threading.Thread):
 
 if __name__ == '__main__':
     target = 'http://202.204.194.17:9168'
-    # target = 'https://www.baidu.com'
     mutex = threading.Lock()
     tls = []
     try:
