@@ -11,8 +11,33 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6b9230ef-5e82-4d51-a5f7-0f0b3d2a3b3e" name="Default Changelist" comment="" />
-    <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
+    <list default="true" id="6b9230ef-5e82-4d51-a5f7-0f0b3d2a3b3e" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/experiment/webserver/exp6.zip" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/experiment/webserver/exp6/html/index.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/experiment/webserver/exp6/html/webserver.log" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/experiment/webserver/exp6/template/webserver.log" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmake-build-debug/CMakeCache.txt" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/CMakeCache.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmake-build-debug/CMakeFiles/CMakeDirectoryInformation.cmake" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/CMakeFiles/CMakeDirectoryInformation.cmake" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmake-build-debug/CMakeFiles/CMakeOutput.log" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/CMakeFiles/CMakeOutput.log" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmake-build-debug/CMakeFiles/Makefile.cmake" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/CMakeFiles/Makefile.cmake" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmake-build-debug/CMakeFiles/Makefile2" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/CMakeFiles/Makefile2" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmake-build-debug/CMakeFiles/OS.dir/DependInfo.cmake" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/CMakeFiles/OS.dir/DependInfo.cmake" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmake-build-debug/CMakeFiles/OS.dir/build.make" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/CMakeFiles/OS.dir/build.make" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmake-build-debug/CMakeFiles/OS.dir/depend.make" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/CMakeFiles/OS.dir/depend.make" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmake-build-debug/CMakeFiles/OS.dir/flags.make" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/CMakeFiles/OS.dir/flags.make" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmake-build-debug/CMakeFiles/OS.dir/link.txt" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/CMakeFiles/OS.dir/link.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmake-build-debug/CMakeFiles/clion-environment.txt" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/CMakeFiles/clion-environment.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmake-build-debug/CMakeFiles/clion-log.txt" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/CMakeFiles/clion-log.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmake-build-debug/Makefile" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/Makefile" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmake-build-debug/OS.cbp" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/OS.cbp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/experiment/CAL_PI/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/experiment/CAL_PI/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/experiment/webserver/exp5/dist/exp5" beforeDir="false" afterPath="$PROJECT_DIR$/experiment/webserver/exp5/dist/exp5" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/experiment/webserver/exp5/thpool.c" beforeDir="false" afterPath="$PROJECT_DIR$/experiment/webserver/exp5/thpool.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/experiment/webserver/exp6/dist/exp6" beforeDir="false" afterPath="$PROJECT_DIR$/experiment/webserver/exp6/dist/exp6" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/experiment/webserver/exp6/webserver.c" beforeDir="false" afterPath="$PROJECT_DIR$/experiment/webserver/exp6/webserver.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/experiment/webserver/exp8/dist/exp5" beforeDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -30,10 +55,15 @@
   <component name="ProjectLevelVcsManager" settingsEditedManually="true">
     <ConfirmationsSetting value="2" id="Add" />
   </component>
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
   <component name="PropertiesComponent">
     <property name="ASKED_ADD_EXTERNAL_FILES" value="true" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="cf.first.check.clang-format" value="false" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$/../ACM" />
     <property name="node.js.detected.package.eslint" value="true" />
     <property name="node.js.detected.package.tslint" value="true" />
@@ -45,25 +75,24 @@
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
     <property name="settings.editor.selected.configurable" value="preferences.pluginManager" />
   </component>
-  <component name="RunDashboard">
-    <option name="ruleStates">
-      <list>
-        <RuleState>
-          <option name="name" value="ConfigurationTypeDashboardGroupingRule" />
-        </RuleState>
-        <RuleState>
-          <option name="name" value="StatusDashboardGroupingRule" />
-        </RuleState>
-      </list>
-    </option>
-  </component>
   <component name="RunManager">
-    <configuration name="OS" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS_2="true" PROJECT_NAME="OS" TARGET_NAME="OS" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="OS" RUN_TARGET_NAME="OS">
+    <configuration name="OS" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="OS" TARGET_NAME="OS" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="OS" RUN_TARGET_NAME="OS">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
+    <configuration default="true" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration default="true" type="GradleAppRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true">
+      <method v="2">
+        <option name="com.jetbrains.cidr.cpp.gradle.execution.GradleNativeBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
   </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="SvnConfiguration">
     <configuration />
   </component>
@@ -142,6 +171,27 @@
       <workItem from="1576912990472" duration="11805000" />
       <workItem from="1576989023864" duration="13195000" />
       <workItem from="1577069215510" duration="5624000" />
+      <workItem from="1577176299108" duration="86000" />
+      <workItem from="1577281715530" duration="129000" />
+      <workItem from="1577284978396" duration="505000" />
+      <workItem from="1582540856378" duration="313000" />
+      <workItem from="1587115838262" duration="1663000" />
+      <workItem from="1588266236671" duration="190000" />
+      <workItem from="1588266438378" duration="78000" />
+      <workItem from="1590590766662" duration="42000" />
+      <workItem from="1590591039161" duration="20000" />
+      <workItem from="1590591107584" duration="101000" />
+      <workItem from="1590592738406" duration="2599000" />
+      <workItem from="1590634708754" duration="510000" />
+      <workItem from="1592203756545" duration="718000" />
+      <workItem from="1592223716146" duration="298000" />
+      <workItem from="1592229212633" duration="729000" />
+      <workItem from="1592238411566" duration="39000" />
+      <workItem from="1592238494066" duration="17000" />
+      <workItem from="1592243629533" duration="18000" />
+      <workItem from="1592320687017" duration="1583000" />
+      <workItem from="1592399785129" duration="603000" />
+      <workItem from="1596294122434" duration="127000" />
     </task>
     <task id="LOCAL-00001" summary="first commit">
       <created>1569337141862</created>
@@ -395,24 +445,30 @@
       <option name="project" value="LOCAL" />
       <updated>1577091550908</updated>
     </task>
-    <option name="localTasksCounter" value="37" />
+    <task id="LOCAL-00037" summary="update">
+      <created>1577176335895</created>
+      <option name="number" value="00037" />
+      <option name="presentableId" value="LOCAL-00037" />
+      <option name="project" value="LOCAL" />
+      <updated>1577176335896</updated>
+    </task>
+    <option name="localTasksCounter" value="38" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
-    <option name="version" value="1" />
+    <option name="version" value="2" />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
     <option name="TAB_STATES">
       <map>
         <entry key="MAIN">
           <value>
-            <State>
-              <option name="COLUMN_ORDER" />
-            </State>
+            <State />
           </value>
         </entry>
       </map>
     </option>
+    <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
@@ -425,5 +481,19 @@
     <MESSAGE value="update page replace" />
     <MESSAGE value="update" />
     <option name="LAST_COMMIT_MESSAGE" value="update" />
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="767" y="403" key="#com.intellij.fileTypes.FileTypeChooser" timestamp="1587116376651">
+      <screen x="0" y="23" width="2048" height="1257" />
+    </state>
+    <state x="767" y="403" key="#com.intellij.fileTypes.FileTypeChooser/0.23.2048.1257@0.23.2048.1257" timestamp="1587116376651" />
+    <state x="639" y="328" key="#com.intellij.openapi.updateSettings.impl.PluginUpdateInfoDialog" timestamp="1587115855473">
+      <screen x="0" y="23" width="2048" height="1257" />
+    </state>
+    <state x="639" y="328" key="#com.intellij.openapi.updateSettings.impl.PluginUpdateInfoDialog/0.23.2048.1257@0.23.2048.1257" timestamp="1587115855473" />
+    <state x="571" y="232" key="SettingsEditor" timestamp="1588266426748">
+      <screen x="0" y="23" width="2048" height="1257" />
+    </state>
+    <state x="571" y="232" key="SettingsEditor/0.23.2048.1257@0.23.2048.1257" timestamp="1588266426748" />
   </component>
 </project>

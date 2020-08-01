@@ -71,19 +71,29 @@ void logger(int type, char *s1, char *s2, int socket_fd) {
             (void) sprintf(logbuffer, "ERROR: %s:%s Errno=%d exiting pid=%d", s1, s2, errno, getpid());
             break;
         case FORBIDDEN:
-            (void) write(socket_fd,
-                         "HTTP/1.1 403 Forbidden\n"
-                         "Content-Length: 185\n"
-                         "Connection:close\n"
-                         "Content-Type: text/html\n\n"
-                         "<html><head>\n"
-                         "<title>403 Forbidden</title>\n"
-                         "</head><body>\n"
-                         "<h1>Forbidden</h1>\n"
-                         "The requested URL, file type or operationis not allowed on this simple static file webserver.\n"
-                         "</body></html>\n",
-                         271);
-            (void) sprintf(logbuffer, "FORBIDDEN: %s:%s", s1, s2);
+            if (!strncmp(s2, "HEAD", 4) || !strncmp(s2, "head", 4)){
+                (void) write(socket_fd,
+                             "HTTP/1.1 200 OK\n"
+                             "Content-Length: 0\n"
+                             "Connection:close\n"
+                             "Content-Type: text/html\n\n",
+                             271);
+                (void) sprintf(logbuffer, "INFO: HEAD %s", s2);
+            } else {
+                (void) write(socket_fd,
+                             "HTTP/1.1 403 Forbidden\n"
+                             "Content-Length: 185\n"
+                             "Connection:close\n"
+                             "Content-Type: text/html\n\n"
+                             "<html><head>\n"
+                             "<title>403 Forbidden</title>\n"
+                             "</head><body>\n"
+                             "<h1>Forbidden</h1>\n"
+                             "The requested URL, file type or operationis not allowed on this simple static file webserver.\n"
+                             "</body></html>\n",
+                             271);
+                (void) sprintf(logbuffer, "FORBIDDEN: %s:%s", s1, s2);
+            }
             break;
         case NOTFOUND:
             (void) write(socket_fd,
@@ -101,7 +111,7 @@ void logger(int type, char *s1, char *s2, int socket_fd) {
             (void) sprintf(logbuffer, "NOT FOUND: %s:%s", s1, s2);
             break;
         case LOG:
-            (void) sprintf(logbuffer, " INFO: %s:%s:%d", s1, s2, socket_fd);
+            (void) sprintf(logbuffer, "INFO: %s:%s:%d", s1, s2, socket_fd);
             break;
     }
 /* 将 logbuffer 缓存中的消息存入 webserver.log 文件*/

@@ -1,0 +1,48 @@
+2020-04-17 17:35:02
+ INFO: request:GET / HTTP/1.1**Host: 127.0.0.1:8000**Upgrade-Insecure-Requests: 1**Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8**User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.1 Safari/605.1.15**Accept-Language: zh-cn**Accept-Encoding: gzip, deflate**Connection: keep-alive****:1
+2020-04-17 17:35:02
+NOT FOUND: failed to open file:index.html
+2020-04-17 17:35:02
+ INFO: request:GET /favicon.ico HTTP/1.1**Host: 127.0.0.1:8000**Connection: keep-alive**Accept: */***User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.1 Safari/605.1.15**Accept-Language: zh-cn**Referer: http://127.0.0.1:8000/**Accept-Encoding: gzip, deflate****:2
+2020-04-17 17:35:02
+NOT FOUND: failed to open file:favicon.ico
+2020-04-17 17:35:07
+ INFO: request:GET / HTTP/1.1**Host: 127.0.0.1:8000**Upgrade-Insecure-Requests: 1**Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8**User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.1 Safari/605.1.15**Accept-Language: zh-cn**Accept-Encoding: gzip, deflate**Connection: keep-alive****:3
+2020-04-17 17:35:07
+NOT FOUND: failed to open file:index.html
+2020-04-17 17:35:17
+ INFO: request:GET /main HTTP/1.1**Host: 127.0.0.1:8000**Upgrade-Insecure-Requests: 1**Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8**User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.1 Safari/605.1.15**Accept-Language: zh-cn**Accept-Encoding: gzip, deflate**Connection: keep-alive****:4
+2020-04-17 17:35:17
+FORBIDDEN: file extension type not supported:GET /main
+2020-04-17 17:35:17
+ INFO: SEND:main:4
+2020-04-17 17:35:17
+ INFO: Header:HTTP/1.1 200 OK
+Server:nweb/23.0
+Content-Length:96
+Connection:close
+Content-Type: (null)
+
+:4
+2020-04-17 17:35:17
+ INFO: request:GET /favicon.ico HTTP/1.1**Host: 127.0.0.1:8000**Connection: keep-alive**Accept: */***User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.1 Safari/605.1.15**Accept-Language: zh-cn**Referer: http://127.0.0.1:8000/main**Accept-Encoding: gzip, deflate****:5
+2020-04-17 17:35:17
+NOT FOUND: failed to open file:favicon.ico
+2020-04-17 17:35:35
+ INFO: request:GET /main HTTP/1.1**Host: localhost:8000**Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8**Upgrade-Insecure-Requests: 1**Cookie: Hm_lvt_8bb8a09b88dafd85044d3d71177bc951=1585920094,1586002767,1586613189,1586799520; Pycharm-81d56082=9cfe561a-5ce9-4fd9-9acc-3c635e85cd2f; username-localhost-8888="2|1:0|10:1585400471|23:username-localhost-8888|44:ZGIzYWYwNzVhMDg1NDA2NGI1N2FkZmU2YzFiYTIwMTE=|bb95dfbcda2749102074460e7eb89e804b4e68ab7e9ba08a7e0f8ae0cf373194"; _xsrf=2|c9f19b51|b1aa0839b7916a72c65fd60542572a61|1585398470**User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.1 Safari/605.1.15**Accept-Language: zh-cn**Accept-Encoding: gzip, deflate**Connection: keep-alive****:6
+2020-04-17 17:35:35
+FORBIDDEN: file extension type not supported:GET /main
+2020-04-17 17:35:35
+ INFO: SEND:main:6
+2020-04-17 17:35:35
+ INFO: Header:HTTP/1.1 200 OK
+Server:nweb/23.0
+Content-Length:96
+Connection:close
+Content-Type: (null)
+
+:6
+2020-04-17 17:35:35
+ INFO: request:GET /favicon.ico HTTP/1.1**Host: localhost:8000**Accept: */***Connection: keep-alive**Cookie: Hm_lvt_8bb8a09b88dafd85044d3d71177bc951=1585920094,1586002767,1586613189,1586799520; Pycharm-81d56082=9cfe561a-5ce9-4fd9-9acc-3c635e85cd2f; username-localhost-8888="2|1:0|10:1585400471|23:username-localhost-8888|44:ZGIzYWYwNzVhMDg1NDA2NGI1N2FkZmU2YzFiYTIwMTE=|bb95dfbcda2749102074460e7eb89e804b4e68ab7e9ba08a7e0f8ae0cf373194"; _xsrf=2|c9f19b51|b1aa0839b7916a72c65fd60542572a61|1585398470**User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.1 Safari/605.1.15**Accept-Language: zh-cn**Referer: http://localhost:8000/main**Accept-Encoding: gzip, deflate****:7
+2020-04-17 17:35:35
+NOT FOUND: failed to open file:favicon.ico

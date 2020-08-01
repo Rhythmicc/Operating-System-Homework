@@ -269,6 +269,7 @@ void*thpool_monitor(void*param){
     while(threads_keepalive) {
         usleep(500000);
         int wnum = pool->num_threads_working;
+        printf("%s: %d\n", pool->name, wnum);
         pool->aver_work += wnum;
         ++pool->tol;
         pool->min_work = pool->min_work > wnum ? wnum : pool->min_work;

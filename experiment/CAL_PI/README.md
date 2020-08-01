@@ -39,7 +39,7 @@
 
 ## Some operation to optimize
 
-- Obviously, calculate π  is just the process to calculating the area of a circle with radius 1.
+- Obviously, calculating PI is equivalent to calculating the area of a circle with radius 1.
 
 - So I can calculate π through integrating a circle of radius one. This algorithm can greatly improve accuracy and reduce complexity. (A uniform distribution is a subset of a random distribution)
 

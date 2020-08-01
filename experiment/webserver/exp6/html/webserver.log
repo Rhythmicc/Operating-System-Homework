@@ -1,0 +1,62 @@
+2020-04-17 17:40:10
+ INFO: request:GET / HTTP/1.1**Host: 127.0.0.1:8000**Upgrade-Insecure-Requests: 1**Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8**User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.1 Safari/605.1.15**Accept-Language: zh-cn**Accept-Encoding: gzip, deflate**Connection: keep-alive****:1
+2020-04-17 17:40:10
+ INFO: SEND:index.html:1
+2020-04-17 17:40:10
+ INFO: Header:HTTP/1.1 200 OK
+Server:nweb/23.0
+Content-Length:343281
+Connection:close
+Content-Type: text/html
+
+:1
+2020-04-17 17:40:10
+ INFO: request:GET /home/xman/data/tipspluslist?indextype=manht&_req_seqid=0xfdb2d25c00066a82&asyn=1&t=1587116410412&sid=1433_31169_21098_31341_30903_31271_30824_31085_26350_31164_31196 HTTP/1.1**Host: 127.0.0.1:8000**Accept-Encoding: gzip, deflate**Cookie: BD_UPN=143254**Connection: keep-alive**Accept: text/plain, */*; q=0.01**User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.1 Safari/605.1.15**Referer: http://127.0.0.1:8000/**Accept-Language: zh-cn**X-Requested-With: XMLHttpRequest****:2
+2020-04-17 17:40:10
+FORBIDDEN: file extension type not supported:GET /home/xman/data/tipspluslist?indextype=manht&_req_seqid=0xfdb2d25c00066a82&asyn=1&t=1587116410412&sid=1433_31169_21098_31341_30903_31271_30824_31085_26350_31164_31196
+2020-04-17 17:40:10
+NOT FOUND: failed to open file:home/xman/data/tipspluslist?indextype=manht&_req_seqid=0xfdb2d25c00066a82&asyn=1&t=1587116410412&sid=1433_31169_21098_31341_30903_31271_30824_31085_26350_31164_31196
+2020-04-17 17:40:11
+ INFO: request:GET /content-search.xml HTTP/1.1**Host: 127.0.0.1:8000**Accept: */***Accept-Language: zh-cn**Connection: keep-alive**Accept-Encoding: gzip, deflate**User-Agent: com.apple.Safari.SearchHelper/15609.1.20.111.8 CFNetwork/1125.2 Darwin/19.4.0 (x86_64)****:3
+2020-04-17 17:40:11
+FORBIDDEN: file extension type not supported:GET /content-search.xml
+2020-04-17 17:40:11
+NOT FOUND: failed to open file:content-search.xml
+2020-04-17 17:40:11
+ INFO: request:GET /home/msg/data/personalcontent?num=8&indextype=manht&_req_seqid=0xfdb2d25c00066a82&asyn=1&t=1587116411619&sid=1433_31169_21098_31341_30903_31271_30824_31085_26350_31164_31196 HTTP/1.1**Host: 127.0.0.1:8000**Accept-Encoding: gzip, deflate**Cookie: BD_UPN=143254**Connection: keep-alive**Accept: text/plain, */*; q=0.01**User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.1 Safari/605.1.15**Referer: http://127.0.0.1:8000/**Accept-Language: zh-cn**X-Requested-With: XMLHttpRequest****:4
+2020-04-17 17:40:11
+FORBIDDEN: file extension type not supported:GET /home/msg/data/personalcontent?num=8&indextype=manht&_req_seqid=0xfdb2d25c00066a82&asyn=1&t=1587116411619&sid=1433_31169_21098_31341_30903_31271_30824_31085_26350_31164_31196
+2020-04-17 17:40:11
+NOT FOUND: failed to open file:home/msg/data/personalcontent?num=8&indextype=manht&_req_seqid=0xfdb2d25c00066a82&asyn=1&t=1587116411619&sid=1433_31169_21098_31341_30903_31271_30824_31085_26350_31164_31196
+2020-04-17 17:42:25
+ INFO: request:HEAD / HTTP/1.1**Host: 127.0.0.1:8000**User-Agent: python-requests/2.22.0**Accept-Encoding: gzip, deflate**Accept: */***Connection: keep-alive****:1
+2020-04-17 17:42:25
+FORBIDDEN: Only simple GET operation supported:HEAD / HTTP/1.1**Host: 127.0.0.1:8000**User-Agent: python-requests/2.22.0**Accept-Encoding: gzip, deflate**Accept: */***Connection: keep-alive****
+2020-04-17 17:42:25
+FORBIDDEN: file extension type not supported:HEAD
+2020-04-17 17:42:25
+NOT FOUND: failed to open file:/ HTTP/1.1**Host: 127.0.0.1:8000**User-Agent: python-requests/2.22.0**Accept-Encoding: gzip, deflate**Accept: */***Connection: keep-alive****
+2020-04-17 17:42:35
+ INFO: request:HEAD /index.html HTTP/1.1**Host: 127.0.0.1:8000**User-Agent: python-requests/2.22.0**Accept-Encoding: gzip, deflate**Accept: */***Connection: keep-alive****:2
+2020-04-17 17:42:35
+FORBIDDEN: Only simple GET operation supported:HEAD /index.html HTTP/1.1**Host: 127.0.0.1:8000**User-Agent: python-requests/2.22.0**Accept-Encoding: gzip, deflate**Accept: */***Connection: keep-alive****
+2020-04-17 17:42:35
+FORBIDDEN: file extension type not supported:HEAD
+2020-04-17 17:42:35
+NOT FOUND: failed to open file:/index.html HTTP/1.1**Host: 127.0.0.1:8000**User-Agent: python-requests/2.22.0**Accept-Encoding: gzip, deflate**Accept: */***Connection: keep-alive****
+2020-04-17 17:43:04
+ INFO: request:HEAD /index.html HTTP/1.1**Host: 127.0.0.1:8000**User-Agent: python-requests/2.22.0**Accept-Encoding: gzip, deflate**Accept: */***Connection: keep-alive****:3
+2020-04-17 17:43:04
+FORBIDDEN: Only simple GET operation supported:HEAD /index.html HTTP/1.1**Host: 127.0.0.1:8000**User-Agent: python-requests/2.22.0**Accept-Encoding: gzip, deflate**Accept: */***Connection: keep-alive****
+2020-04-17 17:43:04
+FORBIDDEN: file extension type not supported:HEAD
+2020-04-17 17:43:04
+NOT FOUND: failed to open file:/index.html HTTP/1.1**Host: 127.0.0.1:8000**User-Agent: python-requests/2.22.0**Accept-Encoding: gzip, deflate**Accept: */***Connection: keep-alive****
+2020-04-17 17:52:38
+INFO: request:HEAD /index.html HTTP/1.1**Host: 127.0.0.1:8000**User-Agent: python-requests/2.22.0**Accept-Encoding: gzip, deflate**Accept: */***Connection: keep-alive****:1
+2020-04-17 17:52:38
+INFO: HEAD HEAD /index.html HTTP/1.1**Host: 127.0.0.1:8000**User-Agent: python-requests/2.22.0**Accept-Encoding: gzip, deflate**Accept: */***Connection: keep-alive****
+2020-04-17 17:52:38
+INFO: HEAD HEAD
+2020-04-17 17:52:38
+NOT FOUND: failed to open file:/index.html HTTP/1.1**Host: 127.0.0.1:8000**User-Agent: python-requests/2.22.0**Accept-Encoding: gzip, deflate**Accept: */***Connection: keep-alive****
